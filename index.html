@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitMacro Hub - Interactive Macro Tracker</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React 18 & ReactDOM 18 CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel compiler to compile JSX in-browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    /* Custom scrollbar for tab selectors */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 3s infinite;
+    }
+  </style>
+</head>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Preset configurations from user's provided calculator results (image.png)
+    const PRESET_DIETS = {
+      highProtein: {
+        name: "High Protein",
+        calories: 2462,
+        protein: 210,
+        carbs: 279,
+        fat: 63,
+        sugar: 66,
+        satFat: 28,
+        description: "Ideal for muscle building, preservation, and high satiety."
+      },
+      balanced: {
+        name: "Balanced",
+        calories: 2462,
+        protein: 154,
+        carbs: 308,
+        fat: 68,
+        sugar: 66,
+        satFat: 28,
+        description: "Maintains standard dietary proportions for energy and wellness."
+      },
+      lowFat: {
+        name: "Low Fat",
+        calories: 2462,
+        protein: 140,
+        carbs: 411,
+        fat: 30,
+        sugar: 66,
+        satFat: 15,
+        description: "Highly focused on carbs for energy, minimal dietary fats."
+      },
+      lowCarb: {
+        name: "Low Carb",
+        calories: 2462,
+        protein: 185,
+        carbs: 92,
+        fat: 150,
+        sugar: 40,
+        satFat: 35,
+        description: "Keto-leaning high-fat profile to optimize fat adaptation."
+      },
+      custom: {
+        name: "Create Your Own",
+        calories: 2000,
+        protein: 150,
+        carbs: 200,
+        fat: 65,
+        sugar: 50,
+        satFat: 20,
+        description: "Fully custom target set to your exact preferences."
+      }
+    };
+
+    const FOOD_LIBRARY = [
+      { name: "Whey Protein Shake", calories: 140, protein: 25, carbs: 3, fat: 1.5, sugar: 1, satFat: 0.5, category: "Snacks" },
+      { name: "Chicken Breast & Rice", calories: 480, protein: 45, carbs: 50, fat: 6, sugar: 0, satFat: 1.5, category: "Lunch" },
+      { name: "Greek Yogurt & Honey", calories: 220, protein: 18, carbs: 25, fat: 2, sugar: 18, satFat: 1.0, category: "Breakfast" },
+      { name: "Eggs & Avocado Toast", calories: 410, protein: 16, carbs: 32, fat: 22, sugar: 2, satFat: 4.5, category: "Breakfast" },
+      { name: "Grilled Salmon & Broccoli", calories: 510, protein: 42, carbs: 12, fat: 28, sugar: 1, satFat: 5.0, category: "Dinner" },
+      { name: "Mixed Nuts (1 Handful)", calories: 170, protein: 6, carbs: 5, fat: 15, sugar: 1, satFat: 1.5, category: "Snacks" },
+      { name: "Oatmeal with Peanut Butter", calories: 350, protein: 12, carbs: 42, fat: 14, sugar: 8, satFat: 2.0, category: "Breakfast" },
+      { name: "Lean Ground Beef (93/7)", calories: 310, protein: 35, carbs: 0, fat: 12, sugar: 0, satFat: 4.8, category: "Dinner" }
+    ];
+
+    // Inline SVG Icon components for maximum reliability in single-file environment
+    const SVG = {
+      Flame: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+          <path fillRule="evenodd" d="M12.96 3.437a.75.75 0 0 0-1.282 0c-1.32 2.37-2.91 4.522-4.148 6.723-.52.923-.74 1.91-.74 2.84 0 3.866 3.134 7 7 7s7-3.134 7-7c0-.93-.22-1.917-.74-2.84-1.238-2.2-2.829-4.353-4.148-6.723zM12 12a1 1 0 0 0-1 1c0 1.105.895 2 2 2a1 1 0 1 0 0-2 1 1 0 0 0-1-1z" clipRule="evenodd" />
+        </svg>
+      ),
+      Plus: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+      ),
+      Trash: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+        </svg>
+      ),
+      Settings: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+        </svg>
+      ),
+      RotateCcw: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+        </svg>
+      ),
+      Calendar: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+        </svg>
+      ),
+      Sparkles: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 21l-.813-5.096L3 15l5.187-.813L9 9l.813 5.187L15 15l-5.187.813ZM18 7.5 17.25 10.5 14.25 11l3 1.125L18 15l1.125-2.875L22 11l-2.875-.75L18 7.5Z" />
+        </svg>
+      ),
+      Droplet: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.1" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.105-7.5 11.25-7.5 11.25S4.5 17.605 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+        </svg>
+      ),
+      BookOpen: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+        </svg>
+      ),
+      X: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      ),
+      PlusCircle: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+      )
+    };
+
+    function App() {
+      // Application State
+      const [activeTab, setActiveTab] = useState("highProtein");
+      const [customTargets, setCustomTargets] = useState({ ...PRESET_DIETS.custom });
+      const [meals, setMeals] = useState([]);
+      const [waterIntake, setWaterIntake] = useState(0); 
+      const [showAddModal, setShowAddModal] = useState(false);
+      const [showConfigModal, setShowConfigModal] = useState(false);
+      
+      // Custom Dialog confirmation states (Replaces non-compliant window.confirm)
+      const [showResetConfirm, setShowResetConfirm] = useState(false);
+      
+      // Form State
+      const [mealName, setMealName] = useState("");
+      const [mealCalories, setMealCalories] = useState("");
+      const [mealProtein, setMealProtein] = useState("");
+      const [mealCarbs, setMealCarbs] = useState("");
+      const [mealFat, setMealFat] = useState("");
+      const [mealSugar, setMealSugar] = useState("");
+      const [mealSatFat, setMealSatFat] = useState("");
+      const [mealCategory, setMealCategory] = useState("Breakfast");
+
+      // Load from LocalStorage if available
+      useEffect(() => {
+        const savedMeals = localStorage.getItem("macro_meals");
+        const savedActiveTab = localStorage.getItem("macro_active_tab");
+        const savedCustomTargets = localStorage.getItem("macro_custom_targets");
+        const savedWater = localStorage.getItem("macro_water");
+        
+        if (savedMeals) setMeals(JSON.parse(savedMeals));
+        if (savedActiveTab) setActiveTab(savedActiveTab);
+        if (savedCustomTargets) setCustomTargets(JSON.parse(savedCustomTargets));
+        if (savedWater) setWaterIntake(parseInt(savedWater) || 0);
+      }, []);
+
+      // Sync state changes with localStorage
+      const saveToLocal = (updatedMeals, updatedActiveTab, updatedCustomTargets, updatedWater) => {
+        localStorage.setItem("macro_meals", JSON.stringify(updatedMeals));
+        localStorage.setItem("macro_active_tab", updatedActiveTab);
+        localStorage.setItem("macro_custom_targets", JSON.stringify(updatedCustomTargets));
+        localStorage.setItem("macro_water", updatedWater.toString());
+      };
+
+      // Get current active goals
+      const getActiveGoals = () => {
+        if (activeTab === "custom") {
+          return customTargets;
+        }
+        return PRESET_DIETS[activeTab];
+      };
+
+      const goals = getActiveGoals();
+
+      // Calculate consumed totals
+      const consumed = meals.reduce(
+        (acc, meal) => {
+          acc.calories += Number(meal.calories || 0);
+          acc.protein += Number(meal.protein || 0);
+          acc.carbs += Number(meal.carbs || 0);
+          acc.fat += Number(meal.fat || 0);
+          acc.sugar += Number(meal.sugar || 0);
+          acc.satFat += Number(meal.satFat || 0);
+          return acc;
+        },
+        { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, satFat: 0 }
+      );
+
+      // Helper calculation for targets
+      const getPercent = (value, target) => {
+        if (!target) return 0;
+        return Math.min(Math.round((value / target) * 100), 100);
+      };
+
+      // Log handlers
+      const handleAddMeal = (e) => {
+        e.preventDefault();
+        if (!mealName.trim()) return;
+
+        let p = Number(mealProtein) || 0;
+        let c = Number(mealCarbs) || 0;
+        let f = Number(mealFat) || 0;
+        let calculatedCal = Number(mealCalories) || (p * 4 + c * 4 + f * 9);
+
+        const newMeal = {
+          id: Date.now(),
+          name: mealName,
+          calories: Math.round(calculatedCal),
+          protein: p,
+          carbs: c,
+          fat: f,
+          sugar: Number(mealSugar) || 0,
+          satFat: Number(mealSatFat) || 0,
+          category: mealCategory,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        const updated = [...meals, newMeal];
+        setMeals(updated);
+        saveToLocal(updated, activeTab, customTargets, waterIntake);
+
+        // Reset Form
+        setMealName("");
+        setMealCalories("");
+        setMealProtein("");
+        setMealCarbs("");
+        setMealFat("");
+        setMealSugar("");
+        setMealSatFat("");
+        setShowAddModal(false);
+      };
+
+      const handleSelectPreset = (preset) => {
+        setMealName(preset.name);
+        setMealCalories(preset.calories);
+        setMealProtein(preset.protein);
+        setMealCarbs(preset.carbs);
+        setMealFat(preset.fat);
+        setMealSugar(preset.sugar);
+        setMealSatFat(preset.satFat);
+        setMealCategory(preset.category || "Breakfast");
+      };
+
+      const handleDeleteMeal = (id) => {
+        const updated = meals.filter((meal) => meal.id !== id);
+        setMeals(updated);
+        saveToLocal(updated, activeTab, customTargets, waterIntake);
+      };
+
+      const handleResetDay = () => {
+        setMeals([]);
+        setWaterIntake(0);
+        saveToLocal([], activeTab, customTargets, 0);
+        setShowResetConfirm(false);
+      };
+
+      const handleWaterAdd = (amount) => {
+        const updatedWater = Math.max(0, waterIntake + amount);
+        setWaterIntake(updatedWater);
+        saveToLocal(meals, activeTab, customTargets, updatedWater);
+      };
+
+      const updateDietPlan = (planKey) => {
+        setActiveTab(planKey);
+        saveToLocal(meals, planKey, customTargets, waterIntake);
+      };
+
+      const handleSaveCustomConfig = (e) => {
+        e.preventDefault();
+        setCustomTargets(customTargets);
+        saveToLocal(meals, activeTab, customTargets, waterIntake);
+        setShowConfigModal(false);
+      };
+
+      // Dynamic coaching tips mapping directly from screen target indicators
+      const getCoachAdvice = () => {
+        const pPercent = getPercent(consumed.protein, goals.protein);
+        const calPercent = getPercent(consumed.calories, goals.calories);
+
+        if (consumed.calories === 0) {
+          return "Start logging your meals to calculate your real-time performance macros!";
+        }
+        if (consumed.satFat > goals.satFat) {
+          return "⚠️ Daily Saturated Fat limit exceeded. Target extra-lean protein alternatives like turkey breast or plant proteins for the rest of today.";
+        }
+        if (consumed.sugar > goals.sugar) {
+          return "⚠️ Daily sugar threshold surpassed. Prioritize high-fiber, savory snacks to stabilize energy levels.";
+        }
+        if (pPercent < 50 && calPercent > 70) {
+          return "💡 High calories but low protein intake detected. Prioritize clean, lean protein options for your next meal.";
+        }
+        if (pPercent >= 90 && calPercent <= 100) {
+          return "🔥 Excellent protein absorption rate! Perfectly matched with your muscle maintenance targets.";
+        }
+        return "📈 Tracking steady! Maintain consistent hydration levels to optimize macronutrient conversion.";
+      };
+
+      return (
+        <div className="min-h-screen bg-[#0f172a] text-slate-100 flex items-center justify-center p-0 sm:p-6 font-sans select-none">
+          
+          {/* Main frame: smartphone styled box for desktop, native edge-to-edge on mobile */}
+          <div className="w-full max-w-md bg-[#1e293b] sm:rounded-[40px] shadow-2xl overflow-hidden flex flex-col sm:border-8 border-slate-800 relative min-h-screen sm:min-h-[850px] sm:max-h-[90vh]">
+            
+            {/* STICKY HEADER */}
+            <header className="bg-[#1e293b]/95 backdrop-blur-md sticky top-0 z-10 px-5 pt-6 pb-4 border-b border-slate-800/80">
+              <div className="flex justify-between items-center mb-3">
+                <div>
+                  <span className="text-xs uppercase font-extrabold text-teal-400 tracking-wider">FUEL & MACRO COACH</span>
+                  <h1 className="text-2xl font-black text-slate-50 tracking-tight flex items-center gap-1.5">
+                    FitMacro <span className="text-teal-400">Hub</span>
+                  </h1>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setShowConfigModal(true)} 
+                    className="p-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all rounded-full border border-slate-700 text-slate-300"
+                    title="Config Targets"
+                  >
+                    <SVG.Settings />
+                  </button>
+                  <button 
+                    onClick={() => setShowResetConfirm(true)} 
+                    className="p-2.5 bg-slate-800 hover:bg-red-900/40 hover:text-red-300 active:scale-95 transition-all rounded-full border border-slate-700 text-slate-300"
+                    title="Reset Day"
+                  >
+                    <SVG.RotateCcw />
+                  </button>
+                </div>
+              </div>
+
+              {/* Status Header */}
+              <div className="flex items-center gap-2 mb-4 bg-slate-900/50 p-2 rounded-xl border border-slate-800">
+                <div className="flex-1 text-center py-1 text-xs font-bold text-teal-400 bg-slate-800/80 rounded-lg shadow-sm">
+                  Today
+                </div>
+                <div className="text-xs text-slate-400 px-3 flex items-center gap-1.5">
+                  <SVG.Calendar />
+                  <span>Diet Plan: <b className="text-slate-200">{goals.name}</b></span>
+                </div>
+              </div>
+
+              {/* Dynamic Preset Switcher (Referencing image.png) */}
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
+                {Object.keys(PRESET_DIETS).map((dietKey) => {
+                  const isActive = activeTab === dietKey;
+                  return (
+                    <button
+                      key={dietKey}
+                      onClick={() => updateDietPlan(dietKey)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                        isActive 
+                          ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg shadow-teal-500/20' 
+                          : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/50'
+                      }`}
+                    >
+                      {PRESET_DIETS[dietKey].name}
+                    </button>
+                  );
+                })}
+              </div>
+            </header>
+
+            {}
+            {/* SCROLLABLE MAIN CONTENT CONTAINER */}
+            <main className="flex-1 overflow-y-auto px-5 py-4 space-y-5 pb-28">
+              
+              {/* Dynamic Target Macro Progress Panel */}
+              <div className="bg-slate-900/60 p-4 rounded-3xl border border-slate-800 space-y-4">
+                
+                {/* Calories Radial Visualizer */}
+                <div className="flex items-center justify-between pb-3.5 border-b border-slate-800">
+                  <div className="space-y-1">
+                    <span className="text-xs text-slate-400 font-medium">Daily Energy Intake</span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-3xl font-black tracking-tight text-white">{consumed.calories.toLocaleString()}</span>
+                      <span className="text-xs text-slate-400 font-bold">/ {goals.calories.toLocaleString()} kcal</span>
+                    </div>
+                  </div>
+                  <div className="relative flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full border-4 border-slate-800 flex items-center justify-center relative">
+                      <div className="absolute inset-0 rounded-full border-4 border-teal-500 border-t-transparent animate-spin-slow opacity-20"></div>
+                      <span className={consumed.calories > goals.calories ? 'text-red-400' : 'text-teal-400'}>
+                        <SVG.Flame />
+                      </span>
+                    </div>
+                    <div className="absolute -bottom-1 bg-slate-800 px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-tight border border-slate-700">
+                      {getPercent(consumed.calories, goals.calories)}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Tracks */}
+                <div className="space-y-3.5">
+                  {/* Protein */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-sky-400 flex items-center gap-1">💪 Protein</span>
+                      <span className="text-slate-300">
+                        <span className="text-white font-black">{consumed.protein}g</span> / {goals.protein}g
+                      </span>
+                    </div>
+                    <div className="h-3.5 w-full bg-slate-850 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                      <div 
+                        className="h-full bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full transition-all duration-500" 
+                        style={{ width: `${getPercent(consumed.protein, goals.protein)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-500">
+                      <span>Range: {activeTab === "highProtein" ? "104g - 210g" : "Adaptive"}</span>
+                      <span>{getPercent(consumed.protein, goals.protein)}% completed</span>
+                    </div>
+                  </div>
+
+                  {/* Carbs */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-amber-400 flex items-center gap-1">🌾 Carbs</span>
+                      <span className="text-slate-300">
+                        <span className="text-white font-black">{consumed.carbs}g</span> / {goals.carbs}g
+                      </span>
+                    </div>
+                    <div className="h-3.5 w-full bg-slate-855 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                      <div 
+                        className="h-full bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full transition-all duration-500" 
+                        style={{ width: `${getPercent(consumed.carbs, goals.carbs)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-500">
+                      <span>Range: {activeTab === "highProtein" ? "263g - 411g" : "Adaptive"}</span>
+                      <span>{getPercent(consumed.carbs, goals.carbs)}% completed</span>
+                    </div>
+                  </div>
+
+                  {/* Fat */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-emerald-400 flex items-center gap-1">🥑 Fat</span>
+                      <span className="text-slate-300">
+                        <span className="text-white font-black">{consumed.fat}g</span> / {goals.fat}g
+                      </span>
+                    </div>
+                    <div className="h-3.5 w-full bg-slate-860 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                      <div 
+                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500" 
+                        style={{ width: `${getPercent(consumed.fat, goals.fat)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-[10px] text-slate-500">
+                      <span>Range: {activeTab === "highProtein" ? "56g - 98g" : "Adaptive"}</span>
+                      <span>{getPercent(consumed.fat, goals.fat)}% completed</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Saturated Fat & Sugar Limits Tracker (Directly mapping 'image.png' conditions) */}
+                <div className="pt-3 border-t border-slate-800 grid grid-cols-2 gap-3">
+                  <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide">SUGAR</div>
+                      <div className="text-sm font-bold text-slate-200">
+                        {consumed.sugar}g <span className="text-[10px] text-slate-500">/ &lt;{goals.sugar}g</span>
+                      </div>
+                    </div>
+                    <div className={`w-3 h-3 rounded-full transition-all ${consumed.sugar > goals.sugar ? 'bg-red-500 animate-pulse' : 'bg-teal-500'}`} />
+                  </div>
+
+                  <div className="bg-slate-800/40 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wide text-xs">SAT FAT</div>
+                      <div className="text-sm font-bold text-slate-200">
+                        {consumed.satFat}g <span className="text-[10px] text-slate-500">/ &lt;{goals.satFat}g</span>
+                      </div>
+                    </div>
+                    <div className={`w-3 h-3 rounded-full transition-all ${consumed.satFat > goals.satFat ? 'bg-red-500 animate-pulse' : 'bg-teal-500'}`} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Coach Insight banner */}
+              <div className="bg-gradient-to-r from-teal-950/40 to-slate-900 border border-teal-800/40 p-4 rounded-3xl flex gap-3 items-start">
+                <div className="p-2 bg-teal-500/10 text-teal-400 rounded-xl flex-shrink-0">
+                  <SVG.Sparkles />
+                </div>
+                <div className="space-y-0.5">
+                  <h4 className="text-xs font-black uppercase text-teal-400 tracking-wider">Coach Insights</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">{getCoachAdvice()}</p>
+                </div>
+              </div>
+
+              {/* Water Intake Component */}
+              <div className="bg-slate-900/60 p-4 rounded-3xl border border-slate-800 flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-cyan-400"><SVG.Droplet /></span>
+                    <span className="text-sm font-black text-slate-100">Water Log</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">Keep standard metabolic systems active</p>
+                  <div className="text-base font-bold text-cyan-400">
+                    {waterIntake} ml <span className="text-xs text-slate-500">/ 2500 ml</span>
+                  </div>
+                </div>
+                <div className="flex gap-1.5">
+                  <button 
+                    onClick={() => handleWaterAdd(250)}
+                    className="bg-cyan-950/40 hover:bg-cyan-900/60 active:scale-95 border border-cyan-800/50 text-cyan-300 px-3 py-2 rounded-2xl text-xs font-bold transition-all"
+                  >
+                    +250ml
+                  </button>
+                  <button 
+                    onClick={() => handleWaterAdd(500)}
+                    className="bg-cyan-950/40 hover:bg-cyan-900/60 active:scale-95 border border-cyan-800/50 text-cyan-300 px-3 py-2 rounded-2xl text-xs font-bold transition-all"
+                  >
+                    +500ml
+                  </button>
+                </div>
+              </div>
+
+              {/* Dynamic Meal List log */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-base font-black text-slate-100 flex items-center gap-2">
+                    <span className="text-teal-400"><SVG.BookOpen /></span>
+                    Logged Meals ({meals.length})
+                  </h3>
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="text-xs font-bold text-teal-400 flex items-center gap-1 hover:text-teal-300"
+                  >
+                    <SVG.PlusCircle /> Add Custom
+                  </button>
+                </div>
+
+                {meals.length === 0 ? (
+                  <div className="bg-slate-900/30 border border-dashed border-slate-800 p-8 rounded-3xl text-center space-y-3">
+                    <p className="text-xs text-slate-400">No macro items tracked for today.</p>
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2.5 rounded-2xl text-xs font-bold inline-flex items-center gap-1.5 transition-all"
+                    >
+                      Log First Intake
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {meals.map((meal) => (
+                      <div key={meal.id} className="bg-slate-900/40 p-3.5 rounded-2xl border border-slate-800/80 hover:border-slate-750 transition-all flex justify-between items-center">
+                        <div className="space-y-1 flex-1 min-w-0 pr-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs px-2 py-0.5 bg-slate-800 text-teal-400 font-extrabold rounded-md uppercase tracking-wider text-[9px]">{meal.category}</span>
+                            <span className="text-[10px] text-slate-500 font-medium">{meal.time}</span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-100 truncate">{meal.name}</h4>
+                          <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                            <span className="text-sky-450 font-medium">P: {meal.protein}g</span>
+                            <span className="text-amber-450 font-medium">C: {meal.carbs}g</span>
+                            <span className="text-emerald-450 font-medium">F: {meal.fat}g</span>
+                            {(meal.sugar > 0 || meal.satFat > 0) && (
+                              <span className="text-slate-500 hidden sm:inline">
+                                (Sug: {meal.sugar}g, Sat: {meal.satFat}g)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="text-sm font-black text-slate-100">{meal.calories}</div>
+                            <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">kcal</div>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteMeal(meal.id)}
+                            className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
+                          >
+                            <SVG.Trash />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </main>
+
+            {/* Quick action logger floating button */}
+            <div className="absolute bottom-5 left-0 right-0 px-5 pointer-events-none flex justify-center">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="pointer-events-auto bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-extrabold px-6 py-4 rounded-2xl flex items-center gap-2.5 shadow-xl shadow-teal-500/25 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-wider"
+              >
+                <SVG.Plus />
+                Log Daily Intake
+              </button>
+            </div>
+
+            {}
+            {/* MODAL 1: ADD MEAL WITH LIBRARY PRESETS */}
+            {showAddModal && (
+              <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-20 flex flex-col justify-end">
+                <div className="bg-[#1e293b] w-full max-h-[85vh] rounded-t-[32px] overflow-hidden flex flex-col border-t border-slate-700 shadow-2xl">
+                  
+                  <div className="px-5 py-4 border-b border-slate-800 flex justify-between items-center">
+                    <div>
+                      <h3 className="text-base font-black text-slate-100">Log Daily Intake</h3>
+                      <p className="text-xs text-slate-400">Add customizable ingredients or quick presets</p>
+                    </div>
+                    <button 
+                      onClick={() => setShowAddModal(false)}
+                      className="p-1.5 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white"
+                    >
+                      <SVG.X />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                    
+                    {/* Quick Pick library */}
+                    <div className="space-y-2">
+                      <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider">Quick Library Presets</span>
+                      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                        {FOOD_LIBRARY.map((item, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => handleSelectPreset(item)}
+                            className="px-3.5 py-2.5 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-left text-xs whitespace-nowrap space-y-1 transition-all active:scale-95"
+                          >
+                            <div className="font-bold text-slate-100">{item.name}</div>
+                            <div className="text-[10px] text-slate-400 flex gap-2">
+                              <span>{item.calories} kcal</span>
+                              <span className="text-sky-400 font-bold">P:{item.protein}g</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleAddMeal} className="space-y-4">
+                      {/* Session Selector */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-400">Meal Session</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {["Breakfast", "Lunch", "Dinner", "Snacks"].map((cat) => (
+                            <button
+                              key={cat}
+                              type="button;}"
+                              onClick={() => setMealCategory(cat)}
+                              className={`py-2 rounded-xl text-xs font-bold transition-all ${
+                                mealCategory === cat 
+                                  ? 'bg-teal-500/10 text-teal-400 border-2 border-teal-500' 
+                                  : 'bg-slate-800/50 text-slate-400 border border-slate-800 hover:bg-slate-800'
+                              }`}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Meal Name Input */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-400">Meal Name</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g., Avocado Salmon Slices"
+                          value={mealName}
+                          onChange={(e) => setMealName(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-teal-500 transition-colors"
+                        />
+                      </div>
+
+                      {/* Primary Macros */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-sky-400">Protein (g)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            value={mealProtein}
+                            onChange={(e) => setMealProtein(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-sky-500"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-amber-400">Carbs (g)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            value={mealCarbs}
+                            onChange={(e) => setMealCarbs(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Fat and Custom Calorie overrides */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-emerald-400">Fats (g)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            value={mealFat}
+                            onChange={(e) => setMealFat(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-400">Calories (Optional)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="Auto-calculated"
+                            value={mealCalories}
+                            onChange={(e) => setMealCalories(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Advanced subthreshold items from screenshot */}
+                      <div className="p-3 bg-slate-900/60 rounded-2xl border border-slate-800 grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-extrabold text-slate-400">SUGAR (G)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            value={mealSugar}
+                            onChange={(e) => setMealSugar(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-extrabold text-slate-400">SATURATED FAT (G)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            value={mealSatFat}
+                            onChange={(e) => setMealSatFat(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-extrabold py-4 rounded-xl hover:opacity-90 active:scale-95 transition-all text-xs uppercase tracking-wider"
+                      >
+                        Log to Dashboard
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODAL 2: CONFIGURE GOALS MODAL */}
+            {showConfigModal && (
+              <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-20 flex flex-col justify-end">
+                <div className="bg-[#1e293b] w-full max-h-[85vh] rounded-t-[32px] overflow-hidden flex flex-col border-t border-slate-700 shadow-2xl">
+                  
+                  <div className="px-5 py-4 border-b border-slate-800 flex justify-between items-center">
+                    <div>
+                      <h3 className="text-base font-black text-slate-100">Setup Custom Limits</h3>
+                      <p className="text-xs text-slate-400">Modify target threshold allocations directly</p>
+                    </div>
+                    <button 
+                      onClick={() => setShowConfigModal(false)}
+                      className="p-1.5 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white"
+                    >
+                      <SVG.X />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-5">
+                    <form onSubmit={handleSaveCustomConfig} className="space-y-4">
+                      
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-400">Target Energy (kcal)</label>
+                        <input
+                          type="number"
+                          required
+                          value={customTargets.calories}
+                          onChange={(e) => setCustomTargets({ ...customTargets, calories: Number(e.target.value) })}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-sky-400">Protein (g)</label>
+                          <input
+                            type="number"
+                            required
+                            value={customTargets.protein}
+                            onChange={(e) => setCustomTargets({ ...customTargets, protein: Number(e.target.value) })}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-amber-400">Carbs (g)</label>
+                          <input
+                            type="number"
+                            required
+                            value={customTargets.carbs}
+                            onChange={(e) => setCustomTargets({ ...customTargets, carbs: Number(e.target.value) })}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-emerald-400">Fats (g)</label>
+                          <input
+                            type="number"
+                            required
+                            value={customTargets.fat}
+                            onChange={(e) => setCustomTargets({ ...customTargets, fat: Number(e.target.value) })}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-400">Max Sugar limit (g)</label>
+                          <input
+                            type="number"
+                            required
+                            value={customTargets.sugar}
+                            onChange={(e) => setCustomTargets({ ...customTargets, sugar: Number(e.target.value) })}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-slate-400">Max Sat Fat limit (g)</label>
+                          <input
+                            type="number"
+                            required
+                            value={customTargets.satFat}
+                            onChange={(e) => setCustomTargets({ ...customTargets, satFat: Number(e.target.value) })}
+                            className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="pt-3">
+                        <button
+                          type="submit"
+                          onClick={() => setActiveTab("custom")}
+                          className="w-full bg-teal-500 hover:bg-teal-600 text-white font-extrabold py-3.5 rounded-xl transition-all text-xs uppercase tracking-wider"
+                        >
+                          Apply Custom Allocations
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* CUSTOM CONFIRM MODAL (NO WINDOW.CONFIRM POPUPS) */}
+            {showResetConfirm && (
+              <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-30 flex items-center justify-center p-6">
+                <div className="bg-[#1e293b] w-full max-w-xs rounded-3xl p-5 border border-slate-700/80 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+                  <div className="space-y-1.5 text-center">
+                    <h4 className="text-base font-black text-white">Reset Today's Log?</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      This will wipe all active meals, calories, and hydration logs. This action cannot be undone.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      onClick={() => setShowResetConfirm(false)}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 px-4 rounded-xl text-xs transition-colors"
+                    >
+                      No, Keep
+                    </button>
+                    <button
+                      onClick={handleResetDay}
+                      className="bg-red-500 hover:bg-red-600 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs transition-colors"
+                    >
+                      Yes, Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      );
+    }
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<App />);
+  </script>
+</body>
+</html>
