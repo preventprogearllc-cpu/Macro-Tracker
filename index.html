@@ -675,30 +675,5 @@
     </script>
 </body>
 </html>
-```
-
----
-
-## Technical Details & Operations Guide
-
-### 1. Storing Weekly Data (`localStorage`)
-The application operates entirely on your front-end local instance [1]. It serializes your target goals and daily itemized logs into a stringified JSON object [1]. Every time you:
-* Add or remove a food item,
-* Adjust your daily calorie goals,
-* Apply a calculation from the BMR settings tool,
-The app writes directly to `localStorage` under the identifier `calorieTrackerData` [1]. This guarantees that even if you close your browser or restart, your logs remain safe.
-
-### 2. BMR & TDEE Calculations (Mifflin-St Jeor)
-To display highly tailored activity level recommendations, we have implemented the Mifflin-St Jeor equation. Here is how your daily target can be computed:
-* **Metric Conversion:** Weight in pounds is multiplied by $0.45359237$ to get kilograms. Height in inches is multiplied by $2.54$ to get centimeters.
-* **Base BMR Formulation:**
-  * **Men:** $BMR = (10 \times \text{Weight}_{\text{kg}}) + (6.25 \times \text{Height}_{\text{cm}}) - (5 \times \text{Age}_{\text{years}}) + 5$
-  * **Women:** $BMR = (10 \times \text{Weight}_{\text{kg}}) + (6.25 \times \text{Height}_{\text{cm}}) - (5 \times \text{Age}_{\text{years}}) - 161$
-* **Activity-Based Recommendations (TDEE):**
-  * **Sedentary:** $BMR \times 1.2$
-  * **Lightly Active:** $BMR \times 1.375$
-  * **Moderately Active:** $BMR \times 1.55$
-  * **Very Active:** $BMR \times 1.725$
-  * **Extra Active:** $BMR \times 1.9$
 
 Clicking **"Apply"** next to any of these outputs immediately saves it as your active daily target, which dynamically shifts your weekly progress thresholds instantly.
