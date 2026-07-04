@@ -1,9 +1,8 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitTrack Weekly • Nutrition Dashboard</title>
+    <title>Fit Macro Hub by Prevent Pro Gear LLC</title>
 
     <!-- 
       APP ICONS GUIDE (For bookmarks, shortcuts, and mobile Home Screen saves)
@@ -14,10 +13,10 @@
     -->
 
     <!-- Standard Favicon (displayed in browser tabs) -->
-    <link rel="icon" type="image/png" href="https://placehold.co/32x32/10b981/ffffff?text=FT" id="favicon">
+    <link rel="icon" type="image/png" href="https://www.preventprogear.com/prevent-pro-gear-operational-sustainment-recovery.webp">
 
     <!-- Apple Touch Icon (displayed when saved to Home Screen on iOS/Android devices) -->
-    <link rel="apple-touch-icon" href="https://placehold.co/180x180/0f172a/10b981?text=FitTrack">
+    <link rel="apple-touch-icon" href="https://www.preventprogear.com/prevent-pro-gear-operational-sustainment-recovery.webp">
 
     <!-- Web App Title and configuration when saved to home screen -->
     <meta name="apple-mobile-web-app-title" content="FitTrack">
@@ -54,13 +53,13 @@
         <!-- HEADER -->
         <header class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-6 mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-500">
-                    FitTrack Weekly
+                <h1 class="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-sky-400 to-indigo-500">
+                    Fit Macro Hub by Prevent Pro Gear
                 </h1>
-                <p class="text-sm text-slate-400 mt-1">Professional Recovery & Nutrition Dashboard</p>
+                <p class="text-sm text-slate-400 mt-1">Professional Recovery, Hydration & Nutrition Dashboard</p>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="loadDemoData()" class="px-4 py-2 text-xs font-semibold bg-slate-900 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-950/20 text-slate-400 hover:text-indigo-300 rounded-lg transition duration-200" title="Load sample athletic meals to preview layout">
+                <button onclick="loadDemoData()" class="px-4 py-2 text-xs font-semibold bg-slate-900 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-950/20 text-slate-400 hover:text-indigo-300 rounded-lg transition duration-200" title="Load sample athletic meals & hydration to preview layout">
                     Load Demo Data
                 </button>
                 <button onclick="resetAllData()" class="px-4 py-2 text-xs font-semibold bg-slate-900 border border-slate-750 hover:border-rose-500/50 hover:bg-rose-950/20 text-slate-300 hover:text-rose-400 rounded-lg transition duration-200" title="Completely empty all log entries for the active week view">
@@ -88,6 +87,7 @@
                     </div>
 
                     <div class="space-y-3">
+                        <!-- Daily Calorie Input -->
                         <div class="flex items-center justify-between gap-4">
                             <label for="dailyGoalInput" class="text-sm text-slate-300">Daily Calorie Goal:</label>
                             <div class="flex items-center gap-2">
@@ -98,8 +98,19 @@
                             </div>
                         </div>
 
+                        <!-- Daily Water Input -->
+                        <div class="flex items-center justify-between gap-4 pt-1 border-t border-slate-850/60">
+                            <label for="dailyWaterGoalInput" class="text-sm text-slate-300">Daily Water Goal:</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="dailyWaterGoalInput" min="10" max="500" step="8" 
+                                    class="w-24 px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-center text-sky-400 font-bold focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                    onchange="updateDailyWaterGoal(this.value)">
+                                <span class="text-xs text-slate-500">oz</span>
+                            </div>
+                        </div>
+
                         <!-- Reset Mode Toggle -->
-                        <div class="flex items-center justify-between gap-4 pt-1 border-t border-slate-850">
+                        <div class="flex items-center justify-between gap-4 pt-2 border-t border-slate-850">
                             <label for="weeklyResetMode" class="text-xs text-slate-400 font-medium">Week Tracking Mode:</label>
                             <select id="weeklyResetMode" onchange="updateResetMode(this.value)"
                                 class="px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-indigo-400 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 transition">
@@ -158,6 +169,56 @@
                                     <!-- Populated dynamically -->
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HYDRATION TRACKER CARD -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-400 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-sky-400 fill-current" viewBox="0 0 24 24">
+                                <path d="M12,2.69C12,2.69 19,10.15 19,15A7,7,0,0,1,5,15C5,10.15 12,2.69 12,2.69Z" />
+                            </svg>
+                            Hydration Tracker
+                        </h3>
+                        <span id="hydrationTotal" class="text-sm font-extrabold text-sky-400">0 / 100 oz</span>
+                    </div>
+
+                    <!-- Presets Grid -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="addWater(8)" class="py-2 bg-slate-950 hover:bg-sky-950/30 border border-slate-800 hover:border-sky-500/50 text-slate-300 hover:text-sky-400 rounded-xl text-xs font-bold transition active:scale-95">
+                            +8 oz
+                        </button>
+                        <button onclick="addWater(16.9)" class="py-2 bg-slate-950 hover:bg-sky-950/30 border border-slate-800 hover:border-sky-500/50 text-slate-300 hover:text-sky-400 rounded-xl text-xs font-bold transition active:scale-95" title="Standard Water Bottle">
+                            +16.9 oz
+                        </button>
+                        <button onclick="addWater(24)" class="py-2 bg-slate-950 hover:bg-sky-950/30 border border-slate-800 hover:border-sky-500/50 text-slate-300 hover:text-sky-400 rounded-xl text-xs font-bold transition active:scale-95">
+                            +24 oz
+                        </button>
+                        <button onclick="addWater(-8)" class="py-2 bg-slate-950 hover:bg-rose-950/30 border border-slate-800 hover:border-rose-500/50 text-slate-500 hover:text-rose-400 rounded-xl text-xs font-bold transition active:scale-95" title="Subtract 8 oz (Correction)">
+                            -8 oz
+                        </button>
+                    </div>
+
+                    <!-- Custom Intake Input -->
+                    <div class="flex gap-2 items-center">
+                        <input type="number" id="customWaterInput" min="1" max="150" placeholder="Custom Ounces"
+                            class="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 focus:border-sky-500 focus:outline-none rounded-xl text-xs text-slate-200 placeholder-slate-600 transition">
+                        <button onclick="addCustomWater()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white rounded-xl shadow-lg shadow-sky-600/20 active:scale-[0.98] transition shrink-0">
+                            Add Water
+                        </button>
+                    </div>
+
+                    <!-- Hydration Progress Visualizer -->
+                    <div class="space-y-1 pt-1">
+                        <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-850">
+                            <div id="hydrationProgressBar" class="bg-gradient-to-r from-sky-500 to-indigo-500 h-full rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between items-center text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                            <span>0% Logged</span>
+                            <span id="hydrationPercent">0%</span>
+                            <span>100% Target</span>
                         </div>
                     </div>
                 </div>
@@ -345,6 +406,25 @@
                             <div id="weeklyFatsTotal" class="text-sm font-black text-amber-500">0g</div>
                         </div>
                     </div>
+
+                    <!-- Weekly Hydration Analytics Summary -->
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between items-center bg-slate-950/45 border border-slate-850/60 rounded-2xl p-4.5 shadow-inner">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-sky-500/10 border border-sky-500/20 rounded-xl text-sky-400">
+                                <svg class="w-6 h-6 fill-current animate-pulse" viewBox="0 0 24 24">
+                                    <path d="M12,2.69C12,2.69 19,10.15 19,15A7,7,0,0,1,5,15C5,10.15 12,2.69 12,2.69Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 block">Weekly Hydration Status</span>
+                                <span id="weeklyWaterAverage" class="text-sm font-black text-sky-400">0 oz / day average</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 block">Total Hydration</span>
+                            <span id="weeklyWaterTotal" class="text-base font-black text-slate-200">0 oz</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- WEEKLY TRACKING - 7 DAY CARDS & WEEKLY NAVIGATION -->
@@ -352,9 +432,9 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <div>
                             <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Weekly Log History</h3>
-                            <p class="text-xs text-slate-500 mt-1">Click any day card to log or edit meals for that date</p>
+                            <p class="text-xs text-slate-500 mt-1">Click any day card to log nutrition or water for that date</p>
                         </div>
-                        
+
                         <!-- Premium Week Navigation Controls -->
                         <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 shrink-0 self-end sm:self-auto">
                             <button onclick="navigateWeek(-1)" class="p-1.5 hover:bg-slate-900 text-slate-400 hover:text-white rounded-lg transition" title="Previous Week">
@@ -393,7 +473,7 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-300">Mobile Shortcut Icon Guide</h3>
-                                <p class="text-xs text-slate-500">How to customize the image displayed on your device screen</p>
+                                <p class="text-xs text-slate-500">How to add this app to your home screen </p>
                             </div>
                         </div>
                         <svg id="iconGuideToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -402,35 +482,18 @@
                     </button>
 
                     <div id="iconGuideSection" class="hidden border-t border-slate-800 pt-4 space-y-3 text-xs text-slate-300 leading-relaxed">
-                        <p>
-                            When you bookmark or select <strong>"Add to Home Screen"</strong> on your mobile phone, the device uses the configured HTML metadata to identify what graphic and title to render. You can customize this file directly in three easy steps:
-                        </p>
-                        <ol class="list-decimal list-inside space-y-2 text-slate-400 pl-1">
-                            <li>
-                                <strong class="text-slate-200">Prepare Your Custom Image:</strong> Create or find a square graphic. Recommended dimensions are <code class="text-indigo-400 font-mono">180x180 pixels</code> for mobile screens and <code class="text-indigo-400 font-mono">32x32 pixels</code> for standard browser tabs.
-                            </li>
-                            <li>
-                                <strong class="text-slate-200">Host the File:</strong> Upload your custom graphic to a reliable hosting service (like Imgur, Postimages), or save it in your local folder if self-hosting.
-                            </li>
-                            <li>
-                                <strong class="text-slate-200">Edit HTML Source:</strong> Open this file in any text editor. Look at the topmost <code class="text-indigo-400 font-mono">&lt;head&gt;</code> tags and replace the sample placeholder links in the following lines:
-                                <pre class="bg-slate-950 p-2.5 rounded-lg text-[10px] text-emerald-400 font-mono mt-1 border border-slate-850 overflow-x-auto whitespace-pre">
-&lt;!-- Mobile Home Screen Icon --&gt;
-&lt;link rel="apple-touch-icon" href="YOUR_IMAGE_URL_HERE"&gt;
-
-&lt;!-- Browser Tab Icon --&gt;
-&lt;link rel="icon" type="image/png" href="YOUR_FAVICON_URL_HERE"&gt;</pre>
-                            </li>
-                        </ol>
-                        <div class="p-3 bg-slate-950/80 border border-slate-850 rounded-xl">
+                       
+                           
+                       
+                        
                             <h5 class="font-bold text-slate-200 uppercase tracking-wide text-[10px] text-indigo-400 mb-1">To Add on Your Mobile Device:</h5>
                             <p class="text-[11px] text-slate-400">
                                 <strong>iOS Safari:</strong> Tap the <em class="text-slate-200 font-medium">Share Button</em> (square with up arrow), scroll down, and select <em class="text-slate-200 font-medium">"Add to Home Screen"</em>.<br>
-                                <strong>Android Chrome:</strong> Tap the <em class="text-slate-200 font-medium">three dots</em> menu icon, then select <em class="text-slate-200 font-medium">"Add to Home screen"</em>.
+                                <strong>Android Chrome:</strong> Tap the <em class="text-slate-200 font-medium">three dots</em> menu icon, then select <em class="text-slate-200 font-medium">"Add to home screen"</em>.
                             </p>
                         </div>
                     </div>
-                </div>
+               
 
                 <!-- HELPFUL TIPS -->
                 <div class="bg-slate-900/50 border border-slate-850 rounded-2xl p-4 flex items-start gap-3">
@@ -438,7 +501,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <p class="text-xs text-slate-400 leading-relaxed">
-                        <strong>Daily Recovery Advice:</strong> Ensuring you hit your target caloric window and hit protein demands supports post-workout glycogen replenishment, cellular repair, and injury prevention, keeping your physical systems moving efficiently [1].
+                        <strong>Daily Recovery Advice:</strong> Ensuring you hit your target caloric window, hit protein demands, and sustain systematic hydration supports post-workout glycogen replenishment, cellular repair, and injury prevention, keeping your physical systems moving efficiently [1].
                     </p>
                 </div>
 
@@ -454,6 +517,7 @@
         let appState = {
             settings: { 
                 dailyGoal: 2000, 
+                dailyWaterGoal: 100, // Standard 100oz default target
                 resetMode: 'rolling',
                 currentAnchorDate: null // Will store dynamic navigated ISO date string
             },
@@ -530,10 +594,13 @@
                 appState = JSON.parse(stored);
                 // Backwards compatibility fallbacks
                 if (!appState.settings) {
-                    appState.settings = { dailyGoal: 2000, resetMode: 'rolling' };
+                    appState.settings = { dailyGoal: 2000, dailyWaterGoal: 100, resetMode: 'rolling' };
                 }
                 if (!appState.settings.resetMode) {
                     appState.settings.resetMode = 'rolling';
+                }
+                if (!appState.settings.dailyWaterGoal) {
+                    appState.settings.dailyWaterGoal = 100;
                 }
                 if (!appState.settings.currentAnchorDate) {
                     appState.settings.currentAnchorDate = new Date().toISOString();
@@ -541,7 +608,12 @@
                 if (!appState.quickMeals) {
                     appState.quickMeals = getDefaultQuickMeals();
                 }
-                // NO MORE pruneOldData() here! Keeps all weeks stored permanently.
+                // Upgrade current historical logs to ensure safe water keys
+                Object.keys(appState.history).forEach(key => {
+                    if (appState.history[key].water === undefined) {
+                        appState.history[key].water = 0;
+                    }
+                });
             } else {
                 appState = generateMockData();
                 appState.settings.currentAnchorDate = new Date().toISOString();
@@ -549,6 +621,7 @@
                 saveData();
             }
             document.getElementById('dailyGoalInput').value = appState.settings.dailyGoal;
+            document.getElementById('dailyWaterGoalInput').value = appState.settings.dailyWaterGoal || 100;
             document.getElementById('weeklyResetMode').value = appState.settings.resetMode;
         }
 
@@ -570,9 +643,9 @@
             const anchorStr = appState.settings.currentAnchorDate || new Date().toISOString();
             const currentAnchor = new Date(anchorStr);
             currentAnchor.setDate(currentAnchor.getDate() + (direction * 7));
-            
+
             appState.settings.currentAnchorDate = currentAnchor.toISOString();
-            
+
             // Auto-align selected day focus to the first day of that navigated week
             const newWeekDays = getWeeklyDays();
             selectedDateKey = formatDateKey(newWeekDays[0]);
@@ -586,17 +659,18 @@
         function jumpToCurrentWeek() {
             appState.settings.currentAnchorDate = new Date().toISOString();
             selectedDateKey = formatDateKey(new Date());
-            
+
             cancelEdit();
             saveData();
             renderApp();
         }
 
-        // Seed structured recovery & meal data
+        // Seed structured recovery & hydration data
         function generateMockData() {
             const data = {
                 settings: { 
                     dailyGoal: 2000, 
+                    dailyWaterGoal: 100,
                     resetMode: 'rolling',
                     currentAnchorDate: new Date().toISOString()
                 },
@@ -612,6 +686,8 @@
                 { name: "Scrambled Eggs, Avocado & Sourdough Toast", calories: 550, protein: 24, carbs: 32, fats: 28 },
                 { name: "Greek Yogurt, Nuts & Honey", calories: 380, protein: 20, carbs: 25, fats: 15 }
             ];
+
+            const hydrationOptions = [80, 112, 64, 120, 96, 72, 40];
 
             // Setup mock data relative to system current date
             const anchor = new Date();
@@ -644,6 +720,7 @@
 
                 data.history[dKey] = {
                     goal: 2000,
+                    water: hydrationOptions[idx % hydrationOptions.length],
                     meals: meals
                 };
             });
@@ -655,6 +732,7 @@
         function renderApp() {
             renderWeeklyOverview();
             renderWeeklyHistoryGrid();
+            renderHydrationSection();
             renderSelectedDayLog();
             renderQuickMeals();
         }
@@ -667,16 +745,19 @@
             let weeklyProtein = 0;
             let weeklyCarbs = 0;
             let weeklyFats = 0;
+            let weeklyWaterTotal = 0;
 
             days.forEach(day => {
                 const dKey = formatDateKey(day);
-                const dayData = appState.history[dKey] || { goal: appState.settings.dailyGoal, meals: [] };
+                const dayData = appState.history[dKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
 
                 const dayLimit = dayData.goal || appState.settings.dailyGoal;
                 const dayTotal = dayData.meals.reduce((sum, item) => sum + parseInt(item.calories || 0), 0);
+                const dayWater = dayData.water || 0;
 
                 weeklyTotal += dayTotal;
                 weeklyLimit += dayLimit;
+                weeklyWaterTotal += dayWater;
 
                 weeklyProtein += dayData.meals.reduce((sum, item) => sum + parseInt(item.protein || 0), 0);
                 weeklyCarbs += dayData.meals.reduce((sum, item) => sum + parseInt(item.carbs || 0), 0);
@@ -689,6 +770,11 @@
             document.getElementById('weeklyProteinTotal').innerText = `${weeklyProtein.toLocaleString()}g`;
             document.getElementById('weeklyCarbsTotal').innerText = `${weeklyCarbs.toLocaleString()}g`;
             document.getElementById('weeklyFatsTotal').innerText = `${weeklyFats.toLocaleString()}g`;
+
+            // Render Weekly Hydration Details
+            document.getElementById('weeklyWaterTotal').innerText = `${weeklyWaterTotal.toLocaleString()} oz`;
+            const averageWater = days.length > 0 ? Math.round(weeklyWaterTotal / days.length) : 0;
+            document.getElementById('weeklyWaterAverage').innerText = `${averageWater.toLocaleString()} oz / day average`;
 
             const diff = weeklyLimit - weeklyTotal;
             const diffElValue = document.getElementById('weeklyBudgetDiffValue');
@@ -739,12 +825,15 @@
                 const dKey = formatDateKey(day);
                 const isSelected = (dKey === selectedDateKey);
 
-                const dayData = appState.history[dKey] || { goal: appState.settings.dailyGoal, meals: [] };
+                const dayData = appState.history[dKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
                 const dayLimit = dayData.goal || appState.settings.dailyGoal;
                 const dayTotal = dayData.meals.reduce((sum, item) => sum + parseInt(item.calories || 0), 0);
+                const waterTotal = dayData.water || 0;
+                const waterLimit = appState.settings.dailyWaterGoal || 100;
 
                 const isOver = dayTotal > dayLimit;
-                const percent = dayLimit > 0 ? Math.min((dayTotal / dayLimit) * 100, 100) : 0;
+                const caloriePercent = dayLimit > 0 ? Math.min((dayTotal / dayLimit) * 100, 100) : 0;
+                const waterPercent = waterLimit > 0 ? Math.min((waterTotal / waterLimit) * 100, 100) : 0;
 
                 const dayName = day.toLocaleDateString('en-US', { weekday: 'short' });
                 const dateNum = day.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
@@ -765,22 +854,50 @@
                     <span class="text-xs font-bold ${isSelected ? 'text-indigo-400' : 'text-slate-400'}">${dayName}</span>
                     <span class="text-[10px] text-slate-500 mt-0.5">${dateNum}</span>
 
-                    <!-- Progress Pill (Vertical) -->
+                    <!-- Progress Pill (Vertical Calorie Progress) -->
                     <div class="w-1.5 h-12 bg-slate-800 rounded-full my-3 overflow-hidden flex flex-col justify-end">
-                        <div class="${isOver ? 'bg-rose-500' : 'bg-emerald-400'} rounded-full w-full" style="height: ${percent}%"></div>
+                        <div class="${isOver ? 'bg-rose-500' : 'bg-emerald-400'} rounded-full w-full" style="height: ${caloriePercent}%"></div>
                     </div>
 
                     <span class="text-xs font-bold ${isOver ? 'text-rose-400' : 'text-slate-200'}">${dayTotal}</span>
                     <span class="text-[9px] text-slate-500 mt-0.5">/ ${dayLimit}</span>
+
+                    <!-- Mini Hydration Bar (Horizontal) -->
+                    <div class="w-full bg-slate-950 h-1.5 rounded-full mt-2.5 overflow-hidden border border-slate-850" title="Hydration: ${waterTotal} / ${waterLimit} oz">
+                        <div class="bg-sky-400 h-full rounded-full transition-all duration-300" style="width: ${waterPercent}%"></div>
+                    </div>
                 `;
 
                 gridContainer.appendChild(card);
             });
         }
 
+        // Render current hydration metric outputs
+        function renderHydrationSection() {
+            const dayData = appState.history[selectedDateKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
+            const currentWater = dayData.water || 0;
+            const targetWater = appState.settings.dailyWaterGoal || 100;
+
+            document.getElementById('hydrationTotal').innerText = `${currentWater} / ${targetWater} oz`;
+
+            let hydrationPercent = targetWater > 0 ? (currentWater / targetWater) * 100 : 0;
+            hydrationPercent = Math.min(Math.round(hydrationPercent), 100);
+
+            document.getElementById('hydrationPercent').innerText = `${hydrationPercent}%`;
+
+            const progressBar = document.getElementById('hydrationProgressBar');
+            progressBar.style.width = `${hydrationPercent}%`;
+
+            if (hydrationPercent >= 100) {
+                progressBar.className = "bg-gradient-to-r from-sky-400 to-sky-600 h-full rounded-full transition-all duration-300 ease-out shadow-[0_0_8px_rgba(56,189,248,0.5)]";
+            } else {
+                progressBar.className = "bg-gradient-to-r from-sky-500 to-indigo-500 h-full rounded-full transition-all duration-300 ease-out";
+            }
+        }
+
         // Render logs specifically selected in left panel
         function renderSelectedDayLog() {
-            const dayData = appState.history[selectedDateKey] || { goal: appState.settings.dailyGoal, meals: [] };
+            const dayData = appState.history[selectedDateKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
 
             const tempDate = new Date(selectedDateKey + 'T00:00:00');
             const dayName = tempDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
@@ -847,7 +964,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                             </svg>
                         </button>
-
                         <!-- Delete Button -->
                         <button onclick="deleteMeal(${index})" class="p-1 hover:text-rose-400 text-slate-600 transition" title="Delete entry">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -860,282 +976,290 @@
             });
         }
 
-        // Render Quick Meals Library List
+        // Render Quick Meals library
         function renderQuickMeals() {
             const container = document.getElementById('quickMealsList');
             container.innerHTML = '';
 
-            const meals = appState.quickMeals || [];
-
-            if (meals.length === 0) {
+            if (appState.quickMeals.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-6 text-slate-600 text-xs">
-                        Your library is empty. Click "+ Add Quick Meal" to save one.
+                    <div class="text-center py-4 text-slate-600 text-xs">
+                        Your library is empty. Add quick meals above!
                     </div>
                 `;
                 return;
             }
 
-            meals.forEach(meal => {
-                const item = document.createElement('div');
-                item.className = "flex justify-between items-center bg-slate-950/60 border border-slate-850 rounded-xl p-3 hover:border-slate-800 transition group";
-
-                const p = meal.protein || 0;
-                const c = meal.carbs || 0;
-                const f = meal.fats || 0;
-
-                item.innerHTML = `
-                    <div class="flex-1 pr-1 min-w-0">
-                        <p class="text-sm font-semibold text-slate-200 truncate">${meal.name}</p>
-                        <p class="text-[10px] text-slate-500 font-medium mt-0.5">
-                            <span class="text-emerald-400 font-semibold">P: ${p}g</span> • 
-                            <span class="text-indigo-400 font-semibold">C: ${c}g</span> • 
-                            <span class="text-amber-500 font-semibold">F: ${f}g</span>
+            appState.quickMeals.forEach(meal => {
+                const card = document.createElement('div');
+                card.className = "flex justify-between items-center bg-slate-950/40 border border-slate-850 rounded-xl p-2.5 hover:border-slate-800 transition";
+                
+                card.innerHTML = `
+                    <div class="flex-1 pr-2 min-w-0">
+                        <p class="text-xs font-semibold text-slate-200 truncate">${meal.name}</p>
+                        <p class="text-[9px] text-slate-500 font-semibold mt-0.5">
+                            ${meal.calories} kcal • P: ${meal.protein || 0}g • C: ${meal.carbs || 0}g • F: ${meal.fats || 0}g
                         </p>
                     </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <span class="text-xs font-bold text-slate-300 whitespace-nowrap mr-1">${meal.calories} kcal</span>
-                        
-                        <!-- Log Meal Instant Button -->
-                        <button onclick="logQuickMeal(${meal.id})" class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/20 rounded-lg text-[11px] font-bold transition" title="Log this meal instantly">
-                            Log
+                    <div class="flex items-center gap-1 shrink-0">
+                        <!-- Add Meal Log -->
+                        <button onclick="addQuickMealToLog(${meal.id})" class="p-1.5 hover:bg-emerald-950/30 hover:text-emerald-400 text-slate-400 rounded-lg transition" title="Log this meal to ${selectedDateKey}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+                            </svg>
                         </button>
-
-                        <!-- Edit Quick Meal Button -->
-                        <button onclick="startEditQuickMeal(${meal.id})" class="p-1 hover:text-indigo-400 text-slate-600 transition" title="Edit Quick Meal parameters">
+                        <!-- Edit Quick Meal -->
+                        <button onclick="startEditQuickMeal(${meal.id})" class="p-1.5 hover:bg-indigo-950/30 hover:text-indigo-400 text-slate-400 rounded-lg transition" title="Edit template">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                             </svg>
                         </button>
-
-                        <!-- Delete Quick Meal Button -->
-                        <button onclick="deleteQuickMeal(${meal.id})" class="p-1 hover:text-rose-400 text-slate-600 transition" title="Delete from library">
+                        <!-- Delete Quick Meal -->
+                        <button onclick="deleteQuickMeal(${meal.id})" class="p-1.5 hover:bg-rose-950/30 hover:text-rose-400 text-slate-500 rounded-lg transition" title="Remove template">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
                         </button>
                     </div>
                 `;
-                container.appendChild(item);
+                container.appendChild(card);
             });
         }
 
-        // Change target date focus
+        // Select calendar day card
         function selectDate(dateKey) {
             selectedDateKey = dateKey;
             cancelEdit();
             renderApp();
         }
 
-        // Initialize Edit Mode for a chosen meal
-        function startEditMeal(index) {
-            const dayData = appState.history[selectedDateKey];
-            if (!dayData || !dayData.meals[index]) return;
+        // Hydration tracker controllers
+        function addWater(amount) {
+            ensureDayExists(selectedDateKey);
+            let current = appState.history[selectedDateKey].water || 0;
+            current = Math.max(0, current + amount);
+            appState.history[selectedDateKey].water = current;
+            saveData();
+            renderApp();
+        }
 
-            const meal = dayData.meals[index];
+        function addCustomWater() {
+            const input = document.getElementById('customWaterInput');
+            const amount = parseFloat(input.value);
+            if (!isNaN(amount) && amount > 0) {
+                addWater(amount);
+                input.value = '';
+            }
+        }
+
+        // Help guarantee historical dates exist safe in state
+        function ensureDayExists(dateKey) {
+            if (!appState.history[dateKey]) {
+                appState.history[dateKey] = {
+                    goal: appState.settings.dailyGoal,
+                    water: 0,
+                    meals: []
+                };
+            }
+        }
+
+        // Update Daily Goals
+        function updateDailyGoal(val) {
+            const goal = parseInt(val);
+            if (!isNaN(goal) && goal >= 500) {
+                appState.settings.dailyGoal = goal;
+                // Also update selected day goal for real-time calculation
+                ensureDayExists(selectedDateKey);
+                appState.history[selectedDateKey].goal = goal;
+                saveData();
+                renderApp();
+            }
+        }
+
+        function updateDailyWaterGoal(val) {
+            const goal = parseInt(val);
+            if (!isNaN(goal) && goal >= 10) {
+                appState.settings.dailyWaterGoal = goal;
+                saveData();
+                renderApp();
+            }
+        }
+
+        // Handle meal log form submissions
+        function handleMealSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('mealName').value.trim();
+            const calories = parseInt(document.getElementById('mealCalories').value) || 0;
+            const protein = parseInt(document.getElementById('mealProtein').value) || 0;
+            const carbs = parseInt(document.getElementById('mealCarbs').value) || 0;
+            const fats = parseInt(document.getElementById('mealFats').value) || 0;
+
+            ensureDayExists(selectedDateKey);
+
+            if (editingMealIndex !== null && editingDateKey !== null) {
+                // We are editing an existing meal entry
+                if (appState.history[editingDateKey] && appState.history[editingDateKey].meals[editingMealIndex]) {
+                    appState.history[editingDateKey].meals[editingMealIndex] = {
+                        name, calories, protein, carbs, fats
+                    };
+                }
+                editingMealIndex = null;
+                editingDateKey = null;
+            } else {
+                // Creating a brand new log
+                appState.history[selectedDateKey].meals.push({
+                    name, calories, protein, carbs, fats
+                });
+            }
+
+            // Reset form fields
+            document.getElementById('mealForm').reset();
+            cancelEdit();
+            saveData();
+            renderApp();
+        }
+
+        // Modify meal logic
+        function startEditMeal(index) {
+            ensureDayExists(selectedDateKey);
+            const meal = appState.history[selectedDateKey].meals[index];
+            if (!meal) return;
+
             editingMealIndex = index;
             editingDateKey = selectedDateKey;
 
-            // Load values into UI Inputs
+            // Load values to form
             document.getElementById('mealName').value = meal.name;
             document.getElementById('mealCalories').value = meal.calories;
             document.getElementById('mealProtein').value = meal.protein || '';
             document.getElementById('mealCarbs').value = meal.carbs || '';
             document.getElementById('mealFats').value = meal.fats || '';
 
-            // Swap interface status
+            // Update UI components
             document.getElementById('formTitleText').innerText = "Edit Meal for";
             document.getElementById('formSubmitBtn').innerText = "Update Meal";
-            document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-indigo-400 rounded-full animate-pulse";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
-
-            document.getElementById('mealName').focus();
+            document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-amber-500 rounded-full animate-ping";
         }
 
-        // Terminate active edit state
         function cancelEdit() {
             editingMealIndex = null;
             editingDateKey = null;
 
-            document.getElementById('mealName').value = '';
-            document.getElementById('mealCalories').value = '';
-            document.getElementById('mealProtein').value = '';
-            document.getElementById('mealCarbs').value = '';
-            document.getElementById('mealFats').value = '';
-
+            document.getElementById('mealForm').reset();
             document.getElementById('formTitleText').innerText = "Log Meal for";
             document.getElementById('formSubmitBtn').innerText = "Add Meal Log";
-            document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-indigo-500 rounded-full";
             document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-indigo-500 rounded-full";
         }
 
-        // Initialize Edit Mode for a custom Quick Meal
-        function startEditQuickMeal(id) {
-            const meal = appState.quickMeals.find(m => m.id === id);
-            if (!meal) return;
-
-            editingQuickMealId = id;
-
-            // Open the form section if collapsed
-            const formSection = document.getElementById('quickMealFormSection');
-            formSection.classList.remove('hidden');
-            document.getElementById('quickMealFormToggleText').innerText = "Cancel Edit";
-            document.getElementById('quickMealFormTitle').innerText = "Edit Quick Meal";
-
-            // Load values into inputs
-            document.getElementById('quickMealName').value = meal.name;
-            document.getElementById('quickMealCalories').value = meal.calories;
-            document.getElementById('quickMealProtein').value = meal.protein || '';
-            document.getElementById('quickMealCarbs').value = meal.carbs || '';
-            document.getElementById('quickMealFats').value = meal.fats || '';
-
-            // Change button name
-            document.getElementById('quickMealSaveBtn').innerText = "Update Quick Meal";
-            document.getElementById('quickMealName').focus();
-        }
-
-        // Handle addition or updating of meal logs
-        function handleMealSubmit(event) {
-            event.preventDefault();
-
-            const nameEl = document.getElementById('mealName');
-            const caloriesEl = document.getElementById('mealCalories');
-            const proteinEl = document.getElementById('mealProtein');
-            const carbsEl = document.getElementById('mealCarbs');
-            const fatsEl = document.getElementById('mealFats');
-
-            const name = nameEl.value.trim();
-            const calories = parseInt(caloriesEl.value);
-            const protein = parseInt(proteinEl.value) || 0;
-            const carbs = parseInt(carbsEl.value) || 0;
-            const fats = parseInt(fatsEl.value) || 0;
-
-            if (!name || isNaN(calories)) return;
-
-            const targetKey = (editingMealIndex !== null && editingDateKey) ? editingDateKey : selectedDateKey;
-
-            if (!appState.history[targetKey]) {
-                appState.history[targetKey] = {
-                    goal: appState.settings.dailyGoal,
-                    meals: []
-                };
-            }
-
-            if (editingMealIndex !== null) {
-                // Execute Update
-                appState.history[targetKey].meals[editingMealIndex] = { 
-                    name, 
-                    calories, 
-                    protein, 
-                    carbs, 
-                    fats 
-                };
-                cancelEdit();
-            } else {
-                // Execute Append
-                appState.history[targetKey].meals.push({ 
-                    name, 
-                    calories, 
-                    protein, 
-                    carbs, 
-                    fats 
-                });
-            }
-
-            saveData();
-            renderApp();
-
-            if (editingMealIndex === null) {
-                // Clear fields ready for next standard log entry
-                nameEl.value = '';
-                caloriesEl.value = '';
-                proteinEl.value = '';
-                carbsEl.value = '';
-                fatsEl.value = '';
-                nameEl.focus();
-            }
-        }
-
-        // Delete meal from selected day log
         function deleteMeal(index) {
-            if (appState.history[selectedDateKey]) {
-                // If deleting item currently being edited, abort edit focus first
-                if (editingMealIndex === index && editingDateKey === selectedDateKey) {
-                    cancelEdit();
-                }
-
-                appState.history[selectedDateKey].meals.splice(index, 1);
-                saveData();
-                renderApp();
-            }
-        }
-
-        // Modify Daily Caloric Goal
-        function updateDailyGoal(value) {
-            const newGoal = parseInt(value);
-            if (isNaN(newGoal) || newGoal < 500) return;
-
-            appState.settings.dailyGoal = newGoal;
-
-            // Apply goal to currently active day as well
-            if (!appState.history[selectedDateKey]) {
-                appState.history[selectedDateKey] = {
-                    goal: newGoal,
-                    meals: []
-                };
-            } else {
-                appState.history[selectedDateKey].goal = newGoal;
-            }
-
+            ensureDayExists(selectedDateKey);
+            appState.history[selectedDateKey].meals.splice(index, 1);
+            cancelEdit();
             saveData();
             renderApp();
         }
 
-        // Collapse / Expand BMR Section
+        // BMR Collapsible Toggles
         function toggleBmrCalculator() {
-            const bmrSection = document.getElementById('bmrSection');
-            const toggleIcon = document.getElementById('bmrToggleIcon');
-            const isHidden = bmrSection.classList.contains('hidden');
-            if (isHidden) {
-                bmrSection.classList.remove('hidden');
-                toggleIcon.classList.add('rotate-180');
-            } else {
-                bmrSection.classList.add('hidden');
-                toggleIcon.classList.remove('rotate-180');
-            }
-        }
+            const section = document.getElementById('bmrSection');
+            const toggleText = document.getElementById('bmrToggleText');
+            const icon = document.getElementById('bmrToggleIcon');
 
-        // Collapse / Expand App Icon Guide
-        function toggleIconGuide() {
-            const guideSection = document.getElementById('iconGuideSection');
-            const toggleIcon = document.getElementById('iconGuideToggleIcon');
-            const isHidden = guideSection.classList.contains('hidden');
-            if (isHidden) {
-                guideSection.classList.remove('hidden');
-                toggleIcon.classList.add('rotate-180');
-            } else {
-                guideSection.classList.add('hidden');
-                toggleIcon.classList.remove('rotate-180');
-            }
-        }
-
-        // Collapse / Expand Quick Meal Form
-        function toggleQuickMealForm() {
-            const section = document.getElementById('quickMealFormSection');
-            const btnText = document.getElementById('quickMealFormToggleText');
-            const isHidden = section.classList.contains('hidden');
-            if (isHidden) {
+            if (section.classList.contains('hidden')) {
                 section.classList.remove('hidden');
-                btnText.innerText = "Cancel";
-                document.getElementById('quickMealName').focus();
+                icon.style.transform = "rotate(180deg)";
             } else {
                 section.classList.add('hidden');
+                icon.style.transform = "rotate(0deg)";
+            }
+        }
+
+        // BMR Calculation & Rendering recommendations
+        function calculateBMR() {
+            const gender = document.getElementById('bmrGender').value;
+            const age = parseInt(document.getElementById('bmrAge').value);
+            const weightLbs = parseFloat(document.getElementById('bmrWeight').value);
+            const heightInches = parseFloat(document.getElementById('bmrHeight').value);
+
+            if (!age || !weightLbs || !heightInches) {
+                alert("Please fill in age, weight, and height to calculate BMR.");
+                return;
+            }
+
+            // Convert standard US units to metric values
+            const weightKg = weightLbs * 0.45359237;
+            const heightCm = heightInches * 2.54;
+
+            // Mifflin-St Jeor Formula
+            let bmr = 0;
+            if (gender === 'male') {
+                bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5;
+            } else {
+                bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+            }
+
+            bmr = Math.round(bmr);
+            document.getElementById('bmrVal').innerText = `${bmr.toLocaleString()} kcal`;
+
+            // Setup TDEE Multipliers
+            const activities = [
+                { name: "Sedentary", desc: "Desk job, little to no exercise", mult: 1.2 },
+                { name: "Lightly Active", desc: "Light exercise 1-3 days/week", mult: 1.375 },
+                { name: "Moderately Active", desc: "Moderate workouts 3-5 days/week", mult: 1.55 },
+                { name: "Very Active", desc: "Hard training/sports 6-7 days/week", mult: 1.725 },
+                { name: "Athletic Premium", desc: "Very heavy workouts & physically demanding job", mult: 1.9 }
+            ];
+
+            const recsContainer = document.getElementById('activityRecommendations');
+            recsContainer.innerHTML = '';
+
+            activities.forEach((act, idx) => {
+                const tdee = Math.round(bmr * act.mult);
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center bg-slate-950 p-2 rounded-lg border border-slate-850 hover:border-slate-800 transition gap-2";
+                row.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        <div class="text-[10px] font-bold text-slate-200">${act.name}</div>
+                        <div class="text-[8px] text-slate-500 truncate" title="${act.desc}">${act.desc}</div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="text-xs font-black text-indigo-400">${tdee.toLocaleString()} kcal</span>
+                        <button onclick="applyTdeeTarget(${tdee})" class="bg-indigo-900/50 hover:bg-indigo-600 text-[9px] hover:text-white text-indigo-300 font-bold px-2 py-1 rounded transition">
+                            Apply
+                        </button>
+                    </div>
+                `;
+                recsContainer.appendChild(row);
+            });
+
+            document.getElementById('bmrResults').classList.remove('hidden');
+        }
+
+        // Apply BMR calculated goal directly
+        function applyTdeeTarget(tdee) {
+            document.getElementById('dailyGoalInput').value = tdee;
+            updateDailyGoal(tdee);
+        }
+
+        // Quick Meal creation & templates
+        function toggleQuickMealForm() {
+            const form = document.getElementById('quickMealFormSection');
+            const btnText = document.getElementById('quickMealFormToggleText');
+
+            if (form.classList.contains('hidden')) {
+                form.classList.remove('hidden');
+                btnText.innerText = "Close Form";
+            } else {
+                form.classList.add('hidden');
                 btnText.innerText = "+ Add Quick Meal";
                 clearQuickMealForm();
             }
         }
 
-        // Clear Quick Meal input fields
+        // Clear Quick Meal form
         function clearQuickMealForm() {
             editingQuickMealId = null;
             document.getElementById('quickMealFormTitle').innerText = "Create Quick Meal";
@@ -1148,188 +1272,130 @@
             document.getElementById('quickMealFats').value = '';
         }
 
-        // Save or Update Quick Meal in persistent Library state
+        // Save Quick Meal
         function saveQuickMeal() {
-            const nameEl = document.getElementById('quickMealName');
-            const caloriesEl = document.getElementById('quickMealCalories');
-            const proteinEl = document.getElementById('quickMealProtein');
-            const carbsEl = document.getElementById('quickMealCarbs');
-            const fatsEl = document.getElementById('quickMealFats');
+            const name = document.getElementById('quickMealName').value.trim();
+            const calories = parseInt(document.getElementById('quickMealCalories').value) || 0;
+            const protein = parseInt(document.getElementById('quickMealProtein').value) || 0;
+            const carbs = parseInt(document.getElementById('quickMealCarbs').value) || 0;
+            const fats = parseInt(document.getElementById('quickMealFats').value) || 0;
 
-            const name = nameEl.value.trim();
-            const calories = parseInt(caloriesEl.value);
-            const protein = parseInt(proteinEl.value) || 0;
-            const carbs = parseInt(carbsEl.value) || 0;
-            const fats = parseInt(fatsEl.value) || 0;
-
-            if (!name || isNaN(calories) || calories < 0) {
-                alert("Please enter a valid meal name and calorie count.");
+            if (!name) {
+                alert("Please provide a name for your Quick Meal.");
                 return;
-            }
-
-            if (!appState.quickMeals) {
-                appState.quickMeals = [];
             }
 
             if (editingQuickMealId !== null) {
-                // Execute Update on existing item
-                const mealIndex = appState.quickMeals.findIndex(m => m.id === editingQuickMealId);
-                if (mealIndex !== -1) {
-                    appState.quickMeals[mealIndex] = {
+                // Updating template
+                const idx = appState.quickMeals.findIndex(m => m.id === editingQuickMealId);
+                if (idx !== -1) {
+                    appState.quickMeals[idx] = {
                         id: editingQuickMealId,
-                        name,
-                        calories,
-                        protein,
-                        carbs,
-                        fats
+                        name, calories, protein, carbs, fats
                     };
                 }
             } else {
-                // Execute Append new item
-                const newQuickMeal = {
-                    id: Date.now(),
-                    name,
-                    calories,
-                    protein,
-                    carbs,
-                    fats
-                };
-                appState.quickMeals.push(newQuickMeal);
+                // Creating a brand new template
+                const newId = Date.now();
+                appState.quickMeals.push({
+                    id: newId,
+                    name, calories, protein, carbs, fats
+                });
             }
 
-            saveData();
             clearQuickMealForm();
             document.getElementById('quickMealFormSection').classList.add('hidden');
             document.getElementById('quickMealFormToggleText').innerText = "+ Add Quick Meal";
+
+            saveData();
             renderApp();
         }
 
-        // Instant Log of Quick Meal to active chosen date
-        function logQuickMeal(id) {
+        // Start edit Quick Meal
+        function startEditQuickMeal(id) {
             const meal = appState.quickMeals.find(m => m.id === id);
             if (!meal) return;
 
-            if (!appState.history[selectedDateKey]) {
-                appState.history[selectedDateKey] = {
-                    goal: appState.settings.dailyGoal,
-                    meals: []
-                };
-            }
+            editingQuickMealId = id;
 
+            // Fill Quick Meal inputs
+            document.getElementById('quickMealName').value = meal.name;
+            document.getElementById('quickMealCalories').value = meal.calories;
+            document.getElementById('quickMealProtein').value = meal.protein || '';
+            document.getElementById('quickMealCarbs').value = meal.carbs || '';
+            document.getElementById('quickMealFats').value = meal.fats || '';
+
+            // Update UI fields
+            document.getElementById('quickMealFormTitle').innerText = "Edit Quick Meal Templates";
+            document.getElementById('quickMealSaveBtn').innerText = "Update Template";
+            document.getElementById('quickMealFormSection').classList.remove('hidden');
+            document.getElementById('quickMealFormToggleText').innerText = "Close Form";
+        }
+
+        // Delete Quick Meal template
+        function deleteQuickMeal(id) {
+            if (confirm("Are you sure you want to delete this Quick Meal template?")) {
+                appState.quickMeals = appState.quickMeals.filter(m => m.id !== id);
+                if (editingQuickMealId === id) {
+                    clearQuickMealForm();
+                }
+                saveData();
+                renderApp();
+            }
+        }
+
+        // Add Quick Meal template into active log directly
+        function addQuickMealToLog(id) {
+            const meal = appState.quickMeals.find(m => m.id === id);
+            if (!meal) return;
+
+            ensureDayExists(selectedDateKey);
             appState.history[selectedDateKey].meals.push({
                 name: meal.name,
                 calories: meal.calories,
-                protein: meal.protein,
-                carbs: meal.carbs,
-                fats: meal.fats
+                protein: meal.protein || 0,
+                carbs: meal.carbs || 0,
+                fats: meal.fats || 0
             });
 
             saveData();
             renderApp();
         }
 
-        // Remove Quick Meal from custom library
-        function deleteQuickMeal(id) {
-            if (confirm("Are you sure you want to delete this meal from your Quick Meals library?")) {
-                if (editingQuickMealId === id) {
-                    clearQuickMealForm();
-                    document.getElementById('quickMealFormSection').classList.add('hidden');
-                    document.getElementById('quickMealFormToggleText').innerText = "+ Add Quick Meal";
-                }
-                appState.quickMeals = appState.quickMeals.filter(m => m.id !== id);
-                saveData();
-                renderApp();
-            }
-        }
+        // Toggle Icons / Guide collapsibles
+        function toggleIconGuide() {
+            const section = document.getElementById('iconGuideSection');
+            const icon = document.getElementById('iconGuideToggleIcon');
 
-        // Calculate Mifflin-St Jeor BMR & TDEE
-        function calculateBMR() {
-            const gender = document.getElementById('bmrGender').value;
-            const age = parseInt(document.getElementById('bmrAge').value);
-            const weightLbs = parseFloat(document.getElementById('bmrWeight').value);
-            const heightInches = parseFloat(document.getElementById('bmrHeight').value);
-
-            if (isNaN(age) || isNaN(weightLbs) || isNaN(heightInches) || age <= 0 || weightLbs <= 0 || heightInches <= 0) {
-                alert("Please fill in all details with valid positive numbers.");
-                return;
-            }
-
-            const weightKg = weightLbs * 0.45359237;
-            const heightCm = heightInches * 2.54;
-
-            let bmr = 0;
-            if (gender === 'male') {
-                bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5;
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+                icon.style.transform = "rotate(180deg)";
             } else {
-                bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+                section.classList.add('hidden');
+                icon.style.transform = "rotate(0deg)";
             }
-
-            bmr = Math.round(bmr);
-            document.getElementById('bmrVal').innerText = `${bmr.toLocaleString()} kcal`;
-
-            const activities = [
-                { name: "Sedentary", desc: "Little/no exercise", mult: 1.2 },
-                { name: "Lightly Active", desc: "Light exercise 1-3 days/wk", mult: 1.375 },
-                { name: "Moderately Active", desc: "Moderate exercise 3-5 days/wk", mult: 1.55 },
-                { name: "Very Active", desc: "Hard exercise 6-7 days/wk", mult: 1.725 },
-                { name: "Extra Active", desc: "Athletic training/physical job", mult: 1.9 }
-            ];
-
-            const container = document.getElementById('activityRecommendations');
-            container.innerHTML = '';
-
-            activities.forEach(act => {
-                const kcal = Math.round(bmr * act.mult);
-                const row = document.createElement('div');
-                row.className = "flex justify-between items-center bg-slate-950/60 border border-slate-850 p-2.5 rounded-lg text-xs hover:border-slate-800 transition";
-                row.innerHTML = `
-                    <div class="pr-2 min-w-0">
-                        <p class="font-semibold text-slate-200 truncate">${act.name}</p>
-                        <p class="text-[9px] text-slate-500 truncate">${act.desc}</p>
-                    </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="font-bold text-emerald-400 whitespace-nowrap">${kcal.toLocaleString()} kcal</span>
-                        <button type="button" onclick="applyCalorieRecommendation(${kcal})" class="px-2 py-1 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 hover:border-indigo-500/50 text-[10px] font-semibold text-indigo-300 rounded transition">
-                            Apply
-                        </button>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-
-            document.getElementById('bmrResults').classList.remove('hidden');
         }
 
-        // Apply chosen target caloric TDEE to current target setting
-        function applyCalorieRecommendation(kcal) {
-            document.getElementById('dailyGoalInput').value = kcal;
-            updateDailyGoal(kcal);
-        }
-
-        // Load demo mock data back into the app
+        // Seed fully operational Demo Data
         function loadDemoData() {
-            if (confirm("Would you like to load sample recovery and nutrition logs? This will overwrite your current logs.")) {
-                const currentQuickMeals = appState.quickMeals || getDefaultQuickMeals();
-                const preservedGoal = appState.settings.dailyGoal;
-                appState = generateMockData();
-                appState.settings.dailyGoal = preservedGoal; // Prevent target goal reset!
-                appState.quickMeals = currentQuickMeals; // Preserve Quick Meals!
-                selectedDateKey = formatDateKey(new Date());
-                cancelEdit();
+            if (confirm("Loading demo data will populate calories & water logs for the visible week. Continue?")) {
+                const demoState = generateMockData();
+                appState.history = Object.assign({}, appState.history, demoState.history);
                 saveData();
-                document.getElementById('dailyGoalInput').value = appState.settings.dailyGoal;
                 renderApp();
             }
         }
 
-        // Completely clear currently viewed week logs to start fresh, preserving settings & quick meals
+        // Reset All Active Data safely (Preserves custom quick meals & targets)
         function resetAllData() {
-            if (confirm("Are you sure you want to clear all calorie logs for the CURRENT active week? This will empty tracked meals but PRESERVE your daily targets and Quick Meals.")) {
-                const currentDays = getWeeklyDays();
-                currentDays.forEach(day => {
+            if (confirm("Are you sure you want to clear food and water logs for the visible week? This will NOT delete your targets or quick meals.")) {
+                const days = getWeeklyDays();
+                days.forEach(day => {
                     const dKey = formatDateKey(day);
                     if (appState.history[dKey]) {
-                        delete appState.history[dKey];
+                        // Reset logs but retain custom goal targets
+                        appState.history[dKey].meals = [];
+                        appState.history[dKey].water = 0;
                     }
                 });
                 cancelEdit();
@@ -1340,4 +1406,3 @@
     </script>
 </body>
 </html>
-```
