@@ -1,22 +1,15 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fit Macro Hub by Prevent Pro Gear LLC</title>
-
-    <!-- 
-      APP ICONS GUIDE (For bookmarks, shortcuts, and mobile Home Screen saves)
-      To change the image displayed on your device when this app is saved:
-      1. Prepare your icon image (recommended size: 180x180 pixels for mobile, 32x32 for tab favicons).
-      2. Upload your image to a hosting service, local folder, or server.
-      3. Replace the URL in the 'href' attribute below with your image URL.
-    -->
+    <title>FitTrack Weekly • Nutrition & Hydration</title>
 
     <!-- Standard Favicon (displayed in browser tabs) -->
-    <link rel="icon" type="image/png" href="https://www.preventprogear.com/prevent-pro-gear-operational-sustainment-recovery.webp">
+    <link rel="icon" type="image/png" href="https://placehold.co/32x32/10b981/ffffff?text=FT" id="favicon">
 
     <!-- Apple Touch Icon (displayed when saved to Home Screen on iOS/Android devices) -->
-    <link rel="apple-touch-icon" href="https://www.preventprogear.com/prevent-pro-gear-operational-sustainment-recovery.webp">
+    <link rel="apple-touch-icon" href="https://placehold.co/180x180/0f172a/10b981?text=FitTrack">
 
     <!-- Web App Title and configuration when saved to home screen -->
     <meta name="apple-mobile-web-app-title" content="FitTrack">
@@ -46,7 +39,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-indigo-500 selection:text-white">
 
     <div class="max-w-6xl mx-auto px-4 py-8">
 
@@ -54,7 +47,7 @@
         <header class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-6 mb-8 gap-4">
             <div>
                 <h1 class="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-sky-400 to-indigo-500">
-                    Fit Macro Hub by Prevent Pro Gear
+                    FitTrack Weekly
                 </h1>
                 <p class="text-sm text-slate-400 mt-1">Professional Recovery, Hydration & Nutrition Dashboard</p>
             </div>
@@ -62,7 +55,7 @@
                 <button onclick="loadDemoData()" class="px-4 py-2 text-xs font-semibold bg-slate-900 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-950/20 text-slate-400 hover:text-indigo-300 rounded-lg transition duration-200" title="Load sample athletic meals & hydration to preview layout">
                     Load Demo Data
                 </button>
-                <button onclick="resetAllData()" class="px-4 py-2 text-xs font-semibold bg-slate-900 border border-slate-750 hover:border-rose-500/50 hover:bg-rose-950/20 text-slate-300 hover:text-rose-400 rounded-lg transition duration-200" title="Completely empty all log entries for the active week view">
+                <button onclick="resetCurrentWeek()" class="px-4 py-2 text-xs font-semibold bg-slate-900 border border-slate-800 hover:border-rose-500/50 hover:bg-rose-950/20 text-slate-300 hover:text-rose-400 rounded-lg transition duration-200" title="Completely empty all log entries for the active week view">
                     Clear Week Data
                 </button>
             </div>
@@ -94,7 +87,7 @@
                                 <input type="number" id="dailyGoalInput" min="500" max="10000" step="50" 
                                     class="w-24 px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-center text-emerald-400 font-bold focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                     onchange="updateDailyGoal(this.value)">
-                                <span class="text-xs text-slate-500">kcal</span>
+                                <span class="text-xs text-slate-500 font-bold">kcal</span>
                             </div>
                         </div>
 
@@ -105,17 +98,30 @@
                                 <input type="number" id="dailyWaterGoalInput" min="10" max="500" step="8" 
                                     class="w-24 px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-center text-sky-400 font-bold focus:outline-none focus:ring-1 focus:ring-sky-500"
                                     onchange="updateDailyWaterGoal(this.value)">
-                                <span class="text-xs text-slate-500">oz</span>
+                                <span class="text-xs text-slate-500 font-bold">oz</span>
                             </div>
+                        </div>
+
+                        <!-- Diet Type Selector -->
+                        <div class="flex items-center justify-between gap-4 pt-1 border-t border-slate-850/60">
+                            <label for="dietTypeSelect" class="text-sm text-slate-300">Diet split profile:</label>
+                            <select id="dietTypeSelect" onchange="updateDietType(this.value)"
+                                class="px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-indigo-400 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 transition cursor-pointer">
+                                <option value="balanced">Balanced (40C/30P/30F)</option>
+                                <option value="high-protein">High Protein (30C/40P/30F)</option>
+                                <option value="low-carb">Low Carb (15C/25P/60F)</option>
+                                <option value="keto">Ketogenic (5C/20P/75F)</option>
+                                <option value="high-fat">High Fat (20C/20P/60F)</option>
+                            </select>
                         </div>
 
                         <!-- Reset Mode Toggle -->
                         <div class="flex items-center justify-between gap-4 pt-2 border-t border-slate-850">
                             <label for="weeklyResetMode" class="text-xs text-slate-400 font-medium">Week Tracking Mode:</label>
                             <select id="weeklyResetMode" onchange="updateResetMode(this.value)"
-                                class="px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-indigo-400 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 transition">
-                                <option value="rolling">Rolling 7-Days</option>
+                                class="px-2.5 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-indigo-400 font-semibold focus:outline-none focus:ring-1 focus:ring-indigo-500 transition cursor-pointer">
                                 <option value="fixed">Fixed Week (Mon-Sun)</option>
+                                <option value="rolling">Rolling 7-Days</option>
                             </select>
                         </div>
                     </div>
@@ -130,25 +136,25 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[10px] text-slate-400 font-medium uppercase mb-1">Gender</label>
-                                <select id="bmrGender" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
+                                <select id="bmrGender" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition cursor-pointer">
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-[10px] text-slate-400 font-medium uppercase mb-1">Age (years)</label>
-                                <input type="number" id="bmrAge" min="1" max="120" placeholder="30" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-880 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
+                                <input type="number" id="bmrAge" min="1" max="120" placeholder="30" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[10px] text-slate-400 font-medium uppercase mb-1">Weight (lbs)</label>
-                                <input type="number" id="bmrWeight" min="1" placeholder="180" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-880 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
+                                <input type="number" id="bmrWeight" min="1" placeholder="180" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-slate-400 font-medium uppercase mb-1">Height (inches)</label>
-                                <input type="number" id="bmrHeight" min="1" placeholder="70" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-880 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
+                                <input type="number" id="bmrHeight" min="1" placeholder="70" class="w-full px-2.5 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
                             </div>
                         </div>
 
@@ -216,7 +222,7 @@
                             <div id="hydrationProgressBar" class="bg-gradient-to-r from-sky-500 to-indigo-500 h-full rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
                         </div>
                         <div class="flex justify-between items-center text-[9px] text-slate-500 font-bold uppercase tracking-wider">
-                            <span>0% Logged</span>
+                            <span id="hydrationPercentLabel">0% Logged</span>
                             <span id="hydrationPercent">0%</span>
                             <span>100% Target</span>
                         </div>
@@ -224,10 +230,10 @@
                 </div>
 
                 <!-- ADD / EDIT MEAL FORM WITH MACRONUTRIENTS -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
                     <h3 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
                         <span id="formStatusIndicator" class="w-2.5 h-2.5 bg-indigo-500 rounded-full"></span>
-                        <span id="formTitleText">Log Meal for</span> <span id="logDayLabel" class="text-indigo-400">Today</span>
+                        <span id="formTitleText">Log Meal for</span> <span id="logDayLabel" class="text-indigo-400 font-extrabold">Today</span>
                     </h3>
 
                     <form id="mealForm" onsubmit="handleMealSubmit(event)" class="space-y-4">
@@ -245,17 +251,17 @@
                                     class="w-full px-2 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
                             </div>
                             <div>
-                                <label class="block text-[10px] text-emerald-400 font-bold mb-1 uppercase tracking-wider">Protein</label>
+                                <label class="block text-[10px] text-emerald-400 font-bold mb-1 uppercase tracking-wider">Protein (g)</label>
                                 <input type="number" id="mealProtein" min="0" placeholder="g" 
                                     class="w-full px-2 py-2 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
                             </div>
                             <div>
-                                <label class="block text-[10px] text-indigo-400 font-bold mb-1 uppercase tracking-wider">Carbs</label>
+                                <label class="block text-[10px] text-indigo-400 font-bold mb-1 uppercase tracking-wider">Carbs (g)</label>
                                 <input type="number" id="mealCarbs" min="0" placeholder="g" 
                                     class="w-full px-2 py-2 bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
                             </div>
                             <div>
-                                <label class="block text-[10px] text-amber-500 font-bold mb-1 uppercase tracking-wider">Fats</label>
+                                <label class="block text-[10px] text-amber-500 font-bold mb-1 uppercase tracking-wider">Fats (g)</label>
                                 <input type="number" id="mealFats" min="0" placeholder="g" 
                                     class="w-full px-2 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 focus:outline-none rounded-lg text-xs text-slate-200 transition">
                             </div>
@@ -319,26 +325,79 @@
                     </div>
                 </div>
 
-                <!-- SELECTED DAY'S DETAILED ITEMIZED LIST & DAILY MACROS -->
+                <!-- SELECTED DAY'S DETAILED ITEMIZED LIST & DAILY MACROS WITH PREMIUM HORIZONTAL PROGRESS BARS -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Logged Meals</h3>
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Daily Macronutrients</h3>
                         <span id="selectedDayTotal" class="text-sm font-bold text-emerald-400">0 kcal</span>
                     </div>
 
-                    <!-- Selected Day Macros Bar -->
-                    <div class="grid grid-cols-3 gap-2 bg-slate-950/40 p-2.5 rounded-xl border border-slate-850 text-center">
-                        <div>
-                            <div class="text-[9px] uppercase font-bold text-slate-500">Protein</div>
-                            <div id="selectedProteinTotal" class="text-xs font-black text-emerald-400">0g</div>
+                    <!-- Redesigned Horizontal Progress Bars Stack -->
+                    <div class="space-y-4 bg-slate-950/40 p-4 rounded-xl border border-slate-850">
+                        <!-- Protein Track -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-semibold">
+                                <span class="flex items-center gap-1.5 text-emerald-400">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    Protein
+                                </span>
+                                <span class="text-slate-300">
+                                    <span id="selectedProteinTotal" class="font-extrabold text-emerald-400">0g</span>
+                                    <span class="text-slate-600">/</span>
+                                    <span id="proteinTargetLabel" class="text-slate-400">0g</span>
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-850">
+                                <div id="proteinBar" class="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                <span id="proteinPercentText">0% of target</span>
+                                <span id="proteinRemainingText" class="normal-case">0g remaining</span>
+                            </div>
                         </div>
-                        <div class="border-x border-slate-850">
-                            <div class="text-[9px] uppercase font-bold text-slate-500">Carbs</div>
-                            <div id="selectedCarbsTotal" class="text-xs font-black text-indigo-400">0g</div>
+
+                        <!-- Carbs Track -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-semibold">
+                                <span class="flex items-center gap-1.5 text-indigo-400">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                                    Carbohydrates
+                                </span>
+                                <span class="text-slate-300">
+                                    <span id="selectedCarbsTotal" class="font-extrabold text-indigo-400">0g</span>
+                                    <span class="text-slate-600">/</span>
+                                    <span id="carbsTargetLabel" class="text-slate-400">0g</span>
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-850">
+                                <div id="carbsBar" class="bg-gradient-to-r from-indigo-600 to-indigo-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                <span id="carbsPercentText">0% of target</span>
+                                <span id="carbsRemainingText" class="normal-case">0g remaining</span>
+                            </div>
                         </div>
-                        <div>
-                            <div class="text-[9px] uppercase font-bold text-slate-500">Fats</div>
-                            <div id="selectedFatsTotal" class="text-xs font-black text-amber-500">0g</div>
+
+                        <!-- Fats Track -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-semibold">
+                                <span class="flex items-center gap-1.5 text-amber-500">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                    Fats
+                                </span>
+                                <span class="text-slate-300">
+                                    <span id="selectedFatsTotal" class="font-extrabold text-amber-500">0g</span>
+                                    <span class="text-slate-600">/</span>
+                                    <span id="fatsTargetLabel" class="text-slate-400">0g</span>
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-850">
+                                <div id="fatsBar" class="bg-gradient-to-r from-amber-600 to-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                <span id="fatsPercentText">0% of target</span>
+                                <span id="fatsRemainingText" class="normal-case">0g remaining</span>
+                            </div>
                         </div>
                     </div>
 
@@ -358,1050 +417,952 @@
                     <div class="absolute -right-16 -top-16 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                    <h2 class="text-xs font-semibold tracking-widest uppercase text-slate-400 mb-2">Weekly Summary</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-xs font-semibold tracking-widest uppercase text-slate-400">Weekly Summary</h2>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button onclick="navigateWeek(-1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition font-bold select-none">←</button>
+                                <span id="weekDisplayRange" class="text-sm font-bold text-indigo-400">Loading Week...</span>
+                                <button onclick="navigateWeek(1)" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white transition font-bold select-none">→</button>
+                            </div>
+                        </div>
+                        <span id="weekStatusBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-950/40 text-indigo-300 border border-indigo-900">Active</span>
+                    </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                        <div>
-                            <div class="flex items-baseline gap-2">
-                                <span id="weeklyCaloriesTotal" class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">0</span>
-                                <span class="text-slate-400 font-medium">/ <span id="weeklyLimitTotal">14,000</span> kcal</span>
-                            </div>
-                            <p class="text-sm text-slate-300 mt-2 font-medium" id="weeklyStatusText">
-                                You are tracking healthy performance limits.
-                            </p>
-                        </div>
-
-                        <!-- Mini metrics box -->
-                        <div class="bg-slate-950/50 border border-slate-850 rounded-2xl p-4 flex flex-col justify-center space-y-1">
-                            <span class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Weekly Status</span>
-                            <div class="text-sm font-bold" id="weeklyBudgetDiffLabel">Remaining Budget:</div>
-                            <div class="text-2xl font-black text-emerald-400" id="weeklyBudgetDiffValue">0 kcal</div>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="mt-6">
-                        <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
-                            <div id="weeklyProgressBar" class="bg-gradient-to-r from-emerald-500 to-indigo-500 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
-                        </div>
-                        <div class="flex justify-between items-center text-[10px] text-slate-500 font-semibold uppercase tracking-wider mt-2">
-                            <span>0% Started</span>
-                            <span id="weeklyProgressPercent">0%</span>
-                            <span>100% Limit</span>
-                        </div>
-                    </div>
-
-                    <!-- Weekly Macronutrient Totals -->
-                    <div class="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-3 gap-2">
-                        <div class="bg-slate-950/30 border border-slate-850/50 rounded-xl p-2 text-center">
-                            <div class="text-[9px] uppercase font-bold text-slate-500">Weekly Protein</div>
-                            <div id="weeklyProteinTotal" class="text-sm font-black text-emerald-400">0g</div>
-                        </div>
-                        <div class="bg-slate-950/30 border border-slate-850/50 rounded-xl p-2 text-center">
-                            <div class="text-[9px] uppercase font-bold text-slate-500">Weekly Carbs</div>
-                            <div id="weeklyCarbsTotal" class="text-sm font-black text-indigo-400">0g</div>
-                        </div>
-                        <div class="bg-slate-950/30 border border-slate-850/50 rounded-xl p-2 text-center">
-                            <div class="text-[9px] uppercase font-bold text-slate-500">Weekly Fats</div>
-                            <div id="weeklyFatsTotal" class="text-sm font-black text-amber-500">0g</div>
-                        </div>
-                    </div>
-
-                    <!-- Weekly Hydration Analytics Summary -->
-                    <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between items-center bg-slate-950/45 border border-slate-850/60 rounded-2xl p-4.5 shadow-inner">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2.5 bg-sky-500/10 border border-sky-500/20 rounded-xl text-sky-400">
-                                <svg class="w-6 h-6 fill-current animate-pulse" viewBox="0 0 24 24">
-                                    <path d="M12,2.69C12,2.69 19,10.15 19,15A7,7,0,0,1,5,15C5,10.15 12,2.69 12,2.69Z" />
-                                </svg>
-                            </div>
+                        <!-- Progress Circle / Indicator -->
+                        <div class="space-y-4">
                             <div>
-                                <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 block">Weekly Hydration Status</span>
-                                <span id="weeklyWaterAverage" class="text-sm font-black text-sky-400">0 oz / day average</span>
+                                <div class="flex justify-between text-xs text-slate-400 font-bold uppercase mb-1">
+                                    <span>Weekly Calories</span>
+                                    <span id="weeklyProgressPercent">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-950 rounded-full h-4 overflow-hidden border border-slate-800">
+                                    <div id="weeklyProgressBar" class="bg-gradient-to-r from-emerald-500 to-indigo-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-3 bg-slate-950/40 border border-slate-850 rounded-xl text-center font-semibold">
+                                    <div class="text-[10px] text-slate-500 uppercase font-bold">Total Consumed</div>
+                                    <div id="weeklyTotalCalories" class="text-lg font-black text-emerald-400">0 kcal</div>
+                                </div>
+                                <div class="p-3 bg-slate-950/40 border border-slate-850 rounded-xl text-center font-semibold">
+                                    <div class="text-[10px] text-slate-500 uppercase font-bold">Weekly Limit</div>
+                                    <div id="weeklyMaxCalories" class="text-lg font-black text-slate-400">0 kcal</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[9px] uppercase font-bold tracking-wider text-slate-500 block">Total Hydration</span>
-                            <span id="weeklyWaterTotal" class="text-base font-black text-slate-200">0 oz</span>
+
+                        <!-- Weekly Hydration Stats & Macros Overview -->
+                        <div class="space-y-4 border-t md:border-t-0 md:border-l border-slate-800 pt-4 md:pt-0 md:pl-6">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse"></span>
+                                Weekly Recovery & Hydration
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="p-3 bg-slate-950/30 border border-slate-850 rounded-xl">
+                                    <div class="text-[9px] text-slate-500 uppercase font-bold">Total Water</div>
+                                    <div id="weeklyTotalWater" class="text-base font-extrabold text-sky-400">0 oz</div>
+                                </div>
+                                <div class="p-3 bg-slate-950/30 border border-slate-850 rounded-xl">
+                                    <div class="text-[9px] text-slate-500 uppercase font-bold">Daily Avg</div>
+                                    <div id="weeklyAvgWater" class="text-base font-extrabold text-indigo-400">0 oz / d</div>
+                                </div>
+                            </div>
+
+                            <!-- Weekly Macro Split Ratios achieved -->
+                            <div class="space-y-2">
+                                <span class="block text-[10px] text-slate-500 font-bold uppercase tracking-wide">Weekly Split Breakdown:</span>
+                                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden flex">
+                                    <div id="weekProteinBar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 33%"></div>
+                                    <div id="weekCarbsBar" class="bg-indigo-500 h-full transition-all duration-300" style="width: 33%"></div>
+                                    <div id="weekFatsBar" class="bg-amber-500 h-full transition-all duration-300" style="width: 34%"></div>
+                                </div>
+                                <div class="flex justify-between text-[9px] font-bold text-slate-400">
+                                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> P: <span id="weekProteinPct">0%</span></span>
+                                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> C: <span id="weekCarbsPct">0%</span></span>
+                                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> F: <span id="weekFatsPct">0%</span></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- WEEKLY TRACKING - 7 DAY CARDS & WEEKLY NAVIGATION -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <div>
-                            <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Weekly Log History</h3>
-                            <p class="text-xs text-slate-500 mt-1">Click any day card to log nutrition or water for that date</p>
-                        </div>
+                <!-- 7-DAY VISUAL OVERVIEW GRID -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold tracking-wider uppercase text-slate-400 flex justify-between items-center">
+                        <span>7-Day Log Grid</span>
+                        <span class="text-xs font-normal text-slate-500">Select card to view or log meals</span>
+                    </h3>
 
-                        <!-- Premium Week Navigation Controls -->
-                        <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 shrink-0 self-end sm:self-auto">
-                            <button onclick="navigateWeek(-1)" class="p-1.5 hover:bg-slate-900 text-slate-400 hover:text-white rounded-lg transition" title="Previous Week">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
-                                </svg>
-                            </button>
-                            <span id="currentWeekRangeDisplay" class="text-xs font-bold text-slate-300 px-2 min-w-[125px] text-center tracking-tight">
-                                Date Range
-                            </span>
-                            <button onclick="navigateWeek(1)" class="p-1.5 hover:bg-slate-900 text-slate-400 hover:text-white rounded-lg transition" title="Next Week">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </button>
-                            <button onclick="jumpToCurrentWeek()" class="p-1.5 bg-indigo-950/40 hover:bg-indigo-900/40 text-indigo-400 hover:text-indigo-300 rounded-lg transition text-xs font-bold px-2.5 border border-indigo-900/40" title="Jump to Today's Current Week">
-                                Today
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 7-Day Grid -->
-                    <div class="grid grid-cols-2 md:grid-cols-7 gap-3" id="weeklyGrid">
-                        <!-- Dynamically filled with 7 Daily cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-3" id="weeklyGrid">
+                        <!-- 7 Days Grid Cards populated dynamically -->
                     </div>
                 </div>
 
-                <!-- COLLAPSIBLE MOBILE APP ICON GUIDE -->
+                <!-- ATHLETE NUTRITIONAL GUIDE AND INFORMATION -->
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-                    <button onclick="toggleIconGuide()" class="w-full flex justify-between items-center text-left focus:outline-none">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-300">Mobile Shortcut Icon Guide</h3>
-                                <p class="text-xs text-slate-500">How to add this app to your home screen </p>
-                            </div>
+                    <h3 class="text-sm font-semibold tracking-wider uppercase text-indigo-400">Athletic Nutrition Guidelines</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-400 leading-relaxed">
+                        <div class="space-y-2">
+                            <p class="font-bold text-slate-200">Protein Allocation (Repair)</p>
+                            <p>For active individuals and athletes, aim for 0.8–1.0 grams of protein per pound of lean body weight daily. The <span class="text-indigo-400">High Protein</span> split profile is ideal for lean muscle preservation and enhanced structural recovery.</p>
                         </div>
-                        <svg id="iconGuideToggleIcon" class="w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-
-                    <div id="iconGuideSection" class="hidden border-t border-slate-800 pt-4 space-y-3 text-xs text-slate-300 leading-relaxed">
-                       
-                           
-                       
-                        
-                            <h5 class="font-bold text-slate-200 uppercase tracking-wide text-[10px] text-indigo-400 mb-1">To Add on Your Mobile Device:</h5>
-                            <p class="text-[11px] text-slate-400">
-                                <strong>iOS Safari:</strong> Tap the <em class="text-slate-200 font-medium">Share Button</em> (square with up arrow), scroll down, and select <em class="text-slate-200 font-medium">"Add to Home Screen"</em>.<br>
-                                <strong>Android Chrome:</strong> Tap the <em class="text-slate-200 font-medium">three dots</em> menu icon, then select <em class="text-slate-200 font-medium">"Add to home screen"</em>.
-                            </p>
+                        <div class="space-y-2">
+                            <p class="font-bold text-slate-200">Hydration Thresholds (Performance)</p>
+                            <p>Dehydration of just 2% of body weight can reduce metabolic efficiency and cognitive focus. Set your target to at least half your body weight in ounces of water per day, plus 12-16 ounces for each hour of strenuous training.</p>
                         </div>
                     </div>
-               
-
-                <!-- HELPFUL TIPS -->
-                <div class="bg-slate-900/50 border border-slate-850 rounded-2xl p-4 flex items-start gap-3">
-                    <svg class="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <p class="text-xs text-slate-400 leading-relaxed">
-                        <strong>Daily Recovery Advice:</strong> Ensuring you hit your target caloric window, hit protein demands, and sustain systematic hydration supports post-workout glycogen replenishment, cellular repair, and injury prevention, keeping your physical systems moving efficiently [1].
-                    </p>
                 </div>
 
             </main>
-
         </div>
-
     </div>
 
-    <!-- MAIN APP CONTROLLER SCRIPT -->
+    <!-- CORE SCRIPT LOGIC -->
     <script>
-        // Set state values
-        let appState = {
-            settings: { 
-                dailyGoal: 2000, 
-                dailyWaterGoal: 100, // Standard 100oz default target
-                resetMode: 'rolling',
-                currentAnchorDate: null // Will store dynamic navigated ISO date string
-            },
-            history: {},
-            quickMeals: []
+        // System and User State Management
+        let state = {
+            currentWeekMonday: "", // formatted YYYY-MM-DD (Representing start of active display)
+            selectedDayIndex: 0, // 0 to 6 index of activeDays
+            dailyCalorieGoal: 2000,
+            dailyWaterGoal: 100,
+            dietType: "balanced",
+            resetMode: "fixed",
+            quickMeals: [],
+            logs: {} // Date-keyed storage (YYYY-MM-DD -> { meals: [], water: 0 })
         };
 
-        let selectedDateKey = ''; // format: YYYY-MM-DD
-        let editingMealIndex = null;
-        let editingDateKey = null;
-        let editingQuickMealId = null; // Stays null unless updating quick meal
+        const DIET_SPLITS = {
+            balanced: { p: 30, c: 40, f: 30 },
+            "high-protein": { p: 40, c: 30, f: 30 },
+            "low-carb": { p: 25, c: 15, f: 60 },
+            keto: { p: 20, c: 5, f: 75 },
+            "high-fat": { p: 20, c: 20, f: 60 }
+        };
 
-        // Helper to format date keys uniformly
-        function formatDateKey(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
+        let editingMealId = null;
+        let editingQuickMealId = null;
 
-        // Generate day arrays dynamically based on selected tracking mode and anchor date
-        function getWeeklyDays() {
-            // Retrieve or initialize anchor date
-            const anchorStr = appState.settings.currentAnchorDate || new Date().toISOString();
-            const anchor = new Date(anchorStr);
-
-            if (appState.settings.resetMode === 'fixed') {
-                // Return Fixed Mon-Sun week boundaries wrapping the anchor date
-                const dayOfWeek = anchor.getDay(); // 0 = Sunday, 1 = Monday, etc.
-                const distanceToMonday = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
-
-                const monday = new Date(anchor);
-                monday.setDate(anchor.getDate() + distanceToMonday);
-
-                const days = [];
-                for (let i = 0; i < 7; i++) {
-                    const tempDate = new Date(monday);
-                    tempDate.setDate(monday.getDate() + i);
-                    days.push(tempDate);
-                }
-                return days;
-            } else {
-                // Default Rolling 7-days ending with anchor date
-                const days = [];
-                for (let i = 6; i >= 0; i--) {
-                    const tempDate = new Date(anchor);
-                    tempDate.setDate(anchor.getDate() - i);
-                    days.push(tempDate);
-                }
-                return days;
-            }
-        }
-
-        // Initialize App
+        // Init App
         window.addEventListener('load', () => {
-            selectedDateKey = formatDateKey(new Date());
-            loadData();
-            renderApp();
+            loadStateFromLocalStorage();
+            setInitialWeek();
+            renderAll();
         });
 
-        // Seed default quick meals
-        function getDefaultQuickMeals() {
-            return [
-                { id: 101, name: "Whey Shake & Banana", calories: 290, protein: 30, carbs: 35, fats: 3 },
-                { id: 102, name: "Oatmeal & Peanut Butter", calories: 420, protein: 12, carbs: 54, fats: 16 },
-                { id: 103, name: "Greek Yogurt & Almonds", calories: 250, protein: 18, carbs: 12, fats: 12 }
-            ];
+        // Parse LocalStorage safely
+        function loadStateFromLocalStorage() {
+            const savedState = localStorage.getItem('fittrack_app_state');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    state.dailyCalorieGoal = parsed.dailyCalorieGoal || 2000;
+                    state.dailyWaterGoal = parsed.dailyWaterGoal || 100;
+                    state.dietType = parsed.dietType || "balanced";
+                    state.resetMode = parsed.resetMode || "fixed";
+                    state.quickMeals = parsed.quickMeals || [];
+                    state.logs = parsed.logs || {};
+                } catch (e) {
+                    console.error("Could not parse saved storage data, resetting local data.");
+                }
+            }
+            
+            if (!state.quickMeals || state.quickMeals.length === 0) {
+                // Initialize default library quick meals if none exist
+                state.quickMeals = [
+                    { id: "qm-1", name: "Whey Shake & Banana", calories: 350, protein: 30, carbs: 45, fats: 3 },
+                    { id: "qm-2", name: "Grilled Chicken & Rice Bowl", calories: 650, protein: 50, carbs: 75, fats: 10 },
+                    { id: "qm-3", name: "Greek Yogurt Bowl", calories: 280, protein: 24, carbs: 20, fats: 8 }
+                ];
+            }
+            
+            // Populate form defaults
+            document.getElementById('dailyGoalInput').value = state.dailyCalorieGoal;
+            document.getElementById('dailyWaterGoalInput').value = state.dailyWaterGoal;
+            document.getElementById('dietTypeSelect').value = state.dietType;
+            document.getElementById('weeklyResetMode').value = state.resetMode;
         }
 
-        // Load data from LocalStorage or seed with Mock Data on first run
-        function loadData() {
-            const stored = localStorage.getItem('calorieTrackerData');
-            if (stored) {
-                appState = JSON.parse(stored);
-                // Backwards compatibility fallbacks
-                if (!appState.settings) {
-                    appState.settings = { dailyGoal: 2000, dailyWaterGoal: 100, resetMode: 'rolling' };
-                }
-                if (!appState.settings.resetMode) {
-                    appState.settings.resetMode = 'rolling';
-                }
-                if (!appState.settings.dailyWaterGoal) {
-                    appState.settings.dailyWaterGoal = 100;
-                }
-                if (!appState.settings.currentAnchorDate) {
-                    appState.settings.currentAnchorDate = new Date().toISOString();
-                }
-                if (!appState.quickMeals) {
-                    appState.quickMeals = getDefaultQuickMeals();
-                }
-                // Upgrade current historical logs to ensure safe water keys
-                Object.keys(appState.history).forEach(key => {
-                    if (appState.history[key].water === undefined) {
-                        appState.history[key].water = 0;
-                    }
-                });
+        function saveStateToLocalStorage() {
+            localStorage.setItem('fittrack_app_state', JSON.stringify(state));
+        }
+
+        // Date Mathematics
+        function getMonday(d) {
+            d = new Date(d);
+            let day = d.getDay();
+            let diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Monday start
+            return new Date(d.setDate(diff));
+        }
+
+        function formatDateString(d) {
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            let year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        function setInitialWeek() {
+            const today = new Date();
+            let startOfCurrentPeriod;
+            if (state.resetMode === "fixed") {
+                startOfCurrentPeriod = getMonday(today);
             } else {
-                appState = generateMockData();
-                appState.settings.currentAnchorDate = new Date().toISOString();
-                appState.quickMeals = getDefaultQuickMeals();
-                saveData();
+                // rolling mode starts 6 days ago so that today is day 7 (index 6)
+                startOfCurrentPeriod = new Date();
+                startOfCurrentPeriod.setDate(today.getDate() - 6);
             }
-            document.getElementById('dailyGoalInput').value = appState.settings.dailyGoal;
-            document.getElementById('dailyWaterGoalInput').value = appState.settings.dailyWaterGoal || 100;
-            document.getElementById('weeklyResetMode').value = appState.settings.resetMode;
-        }
-
-        // Save data to LocalStorage
-        function saveData() {
-            localStorage.setItem('calorieTrackerData', JSON.stringify(appState));
-        }
-
-        // Switch Weekly Tracking Mode
-        function updateResetMode(val) {
-            appState.settings.resetMode = val;
-            cancelEdit();
-            saveData();
-            renderApp();
-        }
-
-        // Navigation through history weeks
-        function navigateWeek(direction) {
-            const anchorStr = appState.settings.currentAnchorDate || new Date().toISOString();
-            const currentAnchor = new Date(anchorStr);
-            currentAnchor.setDate(currentAnchor.getDate() + (direction * 7));
-
-            appState.settings.currentAnchorDate = currentAnchor.toISOString();
-
-            // Auto-align selected day focus to the first day of that navigated week
-            const newWeekDays = getWeeklyDays();
-            selectedDateKey = formatDateKey(newWeekDays[0]);
-
-            cancelEdit();
-            saveData();
-            renderApp();
-        }
-
-        // Instantly snap view focus back to current system calendar week
-        function jumpToCurrentWeek() {
-            appState.settings.currentAnchorDate = new Date().toISOString();
-            selectedDateKey = formatDateKey(new Date());
-
-            cancelEdit();
-            saveData();
-            renderApp();
-        }
-
-        // Seed structured recovery & hydration data
-        function generateMockData() {
-            const data = {
-                settings: { 
-                    dailyGoal: 2000, 
-                    dailyWaterGoal: 100,
-                    resetMode: 'rolling',
-                    currentAnchorDate: new Date().toISOString()
-                },
-                history: {},
-                quickMeals: getDefaultQuickMeals()
-            };
-
-            const mealOptions = [
-                { name: "Oatmeal, Berries & Whey Protein", calories: 480, protein: 35, carbs: 60, fats: 8 },
-                { name: "Grilled Salmon, Sweet Potato & Broccoli", calories: 650, protein: 45, carbs: 50, fats: 22 },
-                { name: "Recovery Amino Shake & Banana", calories: 320, protein: 25, carbs: 45, fats: 2 },
-                { name: "Lean Grass-Fed Beef & Rice Bowl", calories: 720, protein: 50, carbs: 75, fats: 18 },
-                { name: "Scrambled Eggs, Avocado & Sourdough Toast", calories: 550, protein: 24, carbs: 32, fats: 28 },
-                { name: "Greek Yogurt, Nuts & Honey", calories: 380, protein: 20, carbs: 25, fats: 15 }
-            ];
-
-            const hydrationOptions = [80, 112, 64, 120, 96, 72, 40];
-
-            // Setup mock data relative to system current date
-            const anchor = new Date();
-            const days = [];
-            for (let i = 6; i >= 0; i--) {
-                const tempDate = new Date();
-                tempDate.setDate(anchor.getDate() - i);
-                days.push(tempDate);
-            }
-
-            days.forEach((dateObj, idx) => {
-                const dKey = formatDateKey(dateObj);
-                let meals = [];
-
-                if (idx === 0) {
-                    meals = [mealOptions[0], mealOptions[1], mealOptions[2]];
-                } else if (idx === 1) {
-                    meals = [mealOptions[4], mealOptions[3]];
-                } else if (idx === 2) {
-                    meals = [mealOptions[0], mealOptions[1], mealOptions[2], mealOptions[5]];
-                } else if (idx === 3) {
-                    meals = [mealOptions[4], mealOptions[1], mealOptions[3]];
-                } else if (idx === 4) {
-                    meals = [mealOptions[0], mealOptions[3], mealOptions[2]];
-                } else if (idx === 5) {
-                    meals = [mealOptions[0], mealOptions[1], mealOptions[3], mealOptions[2]];
-                } else {
-                    meals = [mealOptions[0]];
-                }
-
-                data.history[dKey] = {
-                    goal: 2000,
-                    water: hydrationOptions[idx % hydrationOptions.length],
-                    meals: meals
-                };
-            });
-
-            return data;
-        }
-
-        // Render entire interface dynamically
-        function renderApp() {
-            renderWeeklyOverview();
-            renderWeeklyHistoryGrid();
-            renderHydrationSection();
-            renderSelectedDayLog();
-            renderQuickMeals();
-        }
-
-        // Calculate and render weekly analytics
-        function renderWeeklyOverview() {
-            const days = getWeeklyDays();
-            let weeklyTotal = 0;
-            let weeklyLimit = 0;
-            let weeklyProtein = 0;
-            let weeklyCarbs = 0;
-            let weeklyFats = 0;
-            let weeklyWaterTotal = 0;
-
-            days.forEach(day => {
-                const dKey = formatDateKey(day);
-                const dayData = appState.history[dKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
-
-                const dayLimit = dayData.goal || appState.settings.dailyGoal;
-                const dayTotal = dayData.meals.reduce((sum, item) => sum + parseInt(item.calories || 0), 0);
-                const dayWater = dayData.water || 0;
-
-                weeklyTotal += dayTotal;
-                weeklyLimit += dayLimit;
-                weeklyWaterTotal += dayWater;
-
-                weeklyProtein += dayData.meals.reduce((sum, item) => sum + parseInt(item.protein || 0), 0);
-                weeklyCarbs += dayData.meals.reduce((sum, item) => sum + parseInt(item.carbs || 0), 0);
-                weeklyFats += dayData.meals.reduce((sum, item) => sum + parseInt(item.fats || 0), 0);
-            });
-
-            document.getElementById('weeklyCaloriesTotal').innerText = weeklyTotal.toLocaleString();
-            document.getElementById('weeklyLimitTotal').innerText = weeklyLimit.toLocaleString();
-
-            document.getElementById('weeklyProteinTotal').innerText = `${weeklyProtein.toLocaleString()}g`;
-            document.getElementById('weeklyCarbsTotal').innerText = `${weeklyCarbs.toLocaleString()}g`;
-            document.getElementById('weeklyFatsTotal').innerText = `${weeklyFats.toLocaleString()}g`;
-
-            // Render Weekly Hydration Details
-            document.getElementById('weeklyWaterTotal').innerText = `${weeklyWaterTotal.toLocaleString()} oz`;
-            const averageWater = days.length > 0 ? Math.round(weeklyWaterTotal / days.length) : 0;
-            document.getElementById('weeklyWaterAverage').innerText = `${averageWater.toLocaleString()} oz / day average`;
-
-            const diff = weeklyLimit - weeklyTotal;
-            const diffElValue = document.getElementById('weeklyBudgetDiffValue');
-            const diffElLabel = document.getElementById('weeklyBudgetDiffLabel');
-            const statusTextEl = document.getElementById('weeklyStatusText');
-
-            if (diff >= 0) {
-                diffElLabel.innerText = "Remaining Budget:";
-                diffElValue.innerText = `${diff.toLocaleString()} kcal`;
-                diffElValue.className = "text-2xl font-black text-emerald-400";
-                statusTextEl.innerText = "Awesome! You are tracking comfortably within your weekly limits.";
+            state.currentWeekMonday = formatDateString(startOfCurrentPeriod);
+            
+            // Set default selected index to match today's day of week
+            if (state.resetMode === "fixed") {
+                let day = today.getDay(); // 0 is Sunday, 1 is Monday...
+                state.selectedDayIndex = day === 0 ? 6 : day - 1;
             } else {
-                diffElLabel.innerText = "Amount Over Limit:";
-                diffElValue.innerText = `${Math.abs(diff).toLocaleString()} kcal`;
-                diffElValue.className = "text-2xl font-black text-rose-500";
-                statusTextEl.innerText = "Alert: You have consumed more than your calculated limit for the week.";
-            }
-
-            // Update Progress Bar
-            let progressPercentage = weeklyLimit > 0 ? (weeklyTotal / weeklyLimit) * 100 : 0;
-            progressPercentage = Math.min(progressPercentage, 100);
-
-            const pBar = document.getElementById('weeklyProgressBar');
-            pBar.style.width = `${progressPercentage}%`;
-            document.getElementById('weeklyProgressPercent').innerText = `${Math.round((weeklyLimit > 0 ? (weeklyTotal / weeklyLimit) : 0) * 100)}%`;
-
-            if (weeklyTotal > weeklyLimit) {
-                pBar.className = "bg-gradient-to-r from-rose-500 to-red-600 h-full rounded-full transition-all duration-500 ease-out";
-            } else {
-                pBar.className = "bg-gradient-to-r from-emerald-500 to-indigo-500 h-full rounded-full transition-all duration-500 ease-out";
+                state.selectedDayIndex = 6; // today is last day in rolling period
             }
         }
 
-        // Render the 7-day card components
-        function renderWeeklyHistoryGrid() {
-            const gridContainer = document.getElementById('weeklyGrid');
-            gridContainer.innerHTML = '';
-
-            const days = getWeeklyDays();
-
-            // Set the current week date range header text
-            const firstDay = days[0];
-            const lastDay = days[6];
-            const rangeText = `${firstDay.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${lastDay.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}`;
-            document.getElementById('currentWeekRangeDisplay').innerText = rangeText;
-
-            days.forEach(day => {
-                const dKey = formatDateKey(day);
-                const isSelected = (dKey === selectedDateKey);
-
-                const dayData = appState.history[dKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
-                const dayLimit = dayData.goal || appState.settings.dailyGoal;
-                const dayTotal = dayData.meals.reduce((sum, item) => sum + parseInt(item.calories || 0), 0);
-                const waterTotal = dayData.water || 0;
-                const waterLimit = appState.settings.dailyWaterGoal || 100;
-
-                const isOver = dayTotal > dayLimit;
-                const caloriePercent = dayLimit > 0 ? Math.min((dayTotal / dayLimit) * 100, 100) : 0;
-                const waterPercent = waterLimit > 0 ? Math.min((waterTotal / waterLimit) * 100, 100) : 0;
-
-                const dayName = day.toLocaleDateString('en-US', { weekday: 'short' });
-                const dateNum = day.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
-
-                const card = document.createElement('button');
-                card.type = 'button';
-                card.onclick = () => selectDate(dKey);
-
-                let cardClasses = `flex flex-col items-center p-3 rounded-xl border text-center transition-all duration-150 active:scale-[0.97] `;
-                if (isSelected) {
-                    cardClasses += `bg-indigo-600/10 border-indigo-500 shadow-lg shadow-indigo-500/5 ring-1 ring-indigo-500`;
-                } else {
-                    cardClasses += `bg-slate-950/40 border-slate-800 hover:border-slate-700 hover:bg-slate-900/30`;
-                }
-                card.className = cardClasses;
-
-                card.innerHTML = `
-                    <span class="text-xs font-bold ${isSelected ? 'text-indigo-400' : 'text-slate-400'}">${dayName}</span>
-                    <span class="text-[10px] text-slate-500 mt-0.5">${dateNum}</span>
-
-                    <!-- Progress Pill (Vertical Calorie Progress) -->
-                    <div class="w-1.5 h-12 bg-slate-800 rounded-full my-3 overflow-hidden flex flex-col justify-end">
-                        <div class="${isOver ? 'bg-rose-500' : 'bg-emerald-400'} rounded-full w-full" style="height: ${caloriePercent}%"></div>
-                    </div>
-
-                    <span class="text-xs font-bold ${isOver ? 'text-rose-400' : 'text-slate-200'}">${dayTotal}</span>
-                    <span class="text-[9px] text-slate-500 mt-0.5">/ ${dayLimit}</span>
-
-                    <!-- Mini Hydration Bar (Horizontal) -->
-                    <div class="w-full bg-slate-950 h-1.5 rounded-full mt-2.5 overflow-hidden border border-slate-850" title="Hydration: ${waterTotal} / ${waterLimit} oz">
-                        <div class="bg-sky-400 h-full rounded-full transition-all duration-300" style="width: ${waterPercent}%"></div>
-                    </div>
-                `;
-
-                gridContainer.appendChild(card);
-            });
-        }
-
-        // Render current hydration metric outputs
-        function renderHydrationSection() {
-            const dayData = appState.history[selectedDateKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
-            const currentWater = dayData.water || 0;
-            const targetWater = appState.settings.dailyWaterGoal || 100;
-
-            document.getElementById('hydrationTotal').innerText = `${currentWater} / ${targetWater} oz`;
-
-            let hydrationPercent = targetWater > 0 ? (currentWater / targetWater) * 100 : 0;
-            hydrationPercent = Math.min(Math.round(hydrationPercent), 100);
-
-            document.getElementById('hydrationPercent').innerText = `${hydrationPercent}%`;
-
-            const progressBar = document.getElementById('hydrationProgressBar');
-            progressBar.style.width = `${hydrationPercent}%`;
-
-            if (hydrationPercent >= 100) {
-                progressBar.className = "bg-gradient-to-r from-sky-400 to-sky-600 h-full rounded-full transition-all duration-300 ease-out shadow-[0_0_8px_rgba(56,189,248,0.5)]";
-            } else {
-                progressBar.className = "bg-gradient-to-r from-sky-500 to-indigo-500 h-full rounded-full transition-all duration-300 ease-out";
-            }
-        }
-
-        // Render logs specifically selected in left panel
-        function renderSelectedDayLog() {
-            const dayData = appState.history[selectedDateKey] || { goal: appState.settings.dailyGoal, water: 0, meals: [] };
-
-            const tempDate = new Date(selectedDateKey + 'T00:00:00');
-            const dayName = tempDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-
-            document.getElementById('logDayLabel').innerText = (selectedDateKey === formatDateKey(new Date())) ? 'Today' : dayName;
-
-            const dayLimit = dayData.goal || appState.settings.dailyGoal;
-            const dayTotal = dayData.meals.reduce((sum, item) => sum + parseInt(item.calories || 0), 0);
-
-            const totalLabel = document.getElementById('selectedDayTotal');
-            totalLabel.innerText = `${dayTotal} / ${dayLimit} kcal`;
-            if (dayTotal > dayLimit) {
-                totalLabel.className = "text-sm font-black text-rose-500";
-            } else {
-                totalLabel.className = "text-sm font-bold text-emerald-400";
-            }
-
-            const totalProtein = dayData.meals.reduce((sum, item) => sum + parseInt(item.protein || 0), 0);
-            const totalCarbs = dayData.meals.reduce((sum, item) => sum + parseInt(item.carbs || 0), 0);
-            const totalFats = dayData.meals.reduce((sum, item) => sum + parseInt(item.fats || 0), 0);
-
-            document.getElementById('selectedProteinTotal').innerText = `${totalProtein}g`;
-            document.getElementById('selectedCarbsTotal').innerText = `${totalCarbs}g`;
-            document.getElementById('selectedFatsTotal').innerText = `${totalFats}g`;
-
-            const mealListContainer = document.getElementById('mealList');
-            mealListContainer.innerHTML = '';
-
-            if (dayData.meals.length === 0) {
-                mealListContainer.innerHTML = `
-                    <div class="text-center py-8 text-slate-600 text-xs">
-                        No food logs tracked for this date yet.
-                    </div>
-                `;
-                return;
-            }
-
-            dayData.meals.forEach((meal, index) => {
-                const item = document.createElement('div');
-                item.className = "flex justify-between items-center bg-slate-950/60 border border-slate-850 rounded-xl p-3 hover:border-slate-800 transition";
-                const p = meal.protein || 0;
-                const c = meal.carbs || 0;
-                const f = meal.fats || 0;
-
-                const isEditingThis = (editingMealIndex === index && editingDateKey === selectedDateKey);
-
-                item.innerHTML = `
-                    <div class="flex-1 pr-2 min-w-0">
-                        <p class="text-sm font-medium ${isEditingThis ? 'text-indigo-400 font-semibold' : 'text-slate-200'} truncate">
-                            ${meal.name} ${isEditingThis ? '<span class="text-[10px] text-indigo-400 italic font-normal">(Editing)</span>' : ''}
-                        </p>
-                        <p class="text-[10px] text-slate-500 font-medium mt-0.5">
-                            <span class="text-emerald-400 font-semibold">P: ${p}g</span> • 
-                            <span class="text-indigo-400 font-semibold">C: ${c}g</span> • 
-                            <span class="text-amber-500 font-semibold">F: ${f}g</span>
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <span class="text-xs font-bold text-slate-300 whitespace-nowrap mr-1">${meal.calories} kcal</span>
-
-                        <!-- Edit Button -->
-                        <button onclick="startEditMeal(${index})" class="p-1 hover:text-indigo-400 text-slate-600 transition" title="Modify entry">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                            </svg>
-                        </button>
-                        <!-- Delete Button -->
-                        <button onclick="deleteMeal(${index})" class="p-1 hover:text-rose-400 text-slate-600 transition" title="Delete entry">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                mealListContainer.appendChild(item);
-            });
-        }
-
-        // Render Quick Meals library
-        function renderQuickMeals() {
-            const container = document.getElementById('quickMealsList');
-            container.innerHTML = '';
-
-            if (appState.quickMeals.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-4 text-slate-600 text-xs">
-                        Your library is empty. Add quick meals above!
-                    </div>
-                `;
-                return;
-            }
-
-            appState.quickMeals.forEach(meal => {
-                const card = document.createElement('div');
-                card.className = "flex justify-between items-center bg-slate-950/40 border border-slate-850 rounded-xl p-2.5 hover:border-slate-800 transition";
+        // Retrieve active 7 days based on start date
+        function getActiveDays() {
+            let days = [];
+            let anchor = new Date(state.currentWeekMonday + "T00:00:00");
+            let dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            for (let i = 0; i < 7; i++) {
+                let d = new Date(anchor);
+                d.setDate(anchor.getDate() + i);
+                let dateStr = formatDateString(d);
                 
-                card.innerHTML = `
-                    <div class="flex-1 pr-2 min-w-0">
-                        <p class="text-xs font-semibold text-slate-200 truncate">${meal.name}</p>
-                        <p class="text-[9px] text-slate-500 font-semibold mt-0.5">
-                            ${meal.calories} kcal • P: ${meal.protein || 0}g • C: ${meal.carbs || 0}g • F: ${meal.fats || 0}g
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-1 shrink-0">
-                        <!-- Add Meal Log -->
-                        <button onclick="addQuickMealToLog(${meal.id})" class="p-1.5 hover:bg-emerald-950/30 hover:text-emerald-400 text-slate-400 rounded-lg transition" title="Log this meal to ${selectedDateKey}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
-                            </svg>
-                        </button>
-                        <!-- Edit Quick Meal -->
-                        <button onclick="startEditQuickMeal(${meal.id})" class="p-1.5 hover:bg-indigo-950/30 hover:text-indigo-400 text-slate-400 rounded-lg transition" title="Edit template">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                            </svg>
-                        </button>
-                        <!-- Delete Quick Meal -->
-                        <button onclick="deleteQuickMeal(${meal.id})" class="p-1.5 hover:bg-rose-950/30 hover:text-rose-400 text-slate-500 rounded-lg transition" title="Remove template">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+                // Keep clean mapping of day titles
+                let dayNum = d.getDay();
+                let dayName = dayNames[dayNum === 0 ? 6 : dayNum - 1];
+
+                days.push({
+                    date: dateStr,
+                    dayName: dayName,
+                    displayDate: (d.getMonth() + 1) + "/" + d.getDate()
+                });
+            }
+            return days;
         }
 
-        // Select calendar day card
-        function selectDate(dateKey) {
-            selectedDateKey = dateKey;
-            cancelEdit();
-            renderApp();
+        // Safe fetch log for date
+        function getLogForDate(dateStr) {
+            if (!state.logs[dateStr]) {
+                state.logs[dateStr] = { meals: [], water: 0 };
+            }
+            return state.logs[dateStr];
         }
 
-        // Hydration tracker controllers
+        // Macro calculation helpers
+        function getMacroGramsTarget() {
+            const split = DIET_SPLITS[state.dietType] || DIET_SPLITS.balanced;
+            const proteinGrams = Math.round((state.dailyCalorieGoal * (split.p / 100)) / 4);
+            const carbsGrams = Math.round((state.dailyCalorieGoal * (split.c / 100)) / 4);
+            const fatsGrams = Math.round((state.dailyCalorieGoal * (split.f / 100)) / 9);
+            return { p: proteinGrams, c: carbsGrams, f: fatsGrams };
+        }
+
+        // NAVIGATION
+        function navigateWeek(direction) {
+            let anchor = new Date(state.currentWeekMonday + "T00:00:00");
+            anchor.setDate(anchor.getDate() + (direction * 7));
+            state.currentWeekMonday = formatDateString(anchor);
+            renderAll();
+        }
+
+        // RESET MODE
+        function updateResetMode(val) {
+            state.resetMode = val;
+            setInitialWeek();
+            saveStateToLocalStorage();
+            renderAll();
+        }
+
+        // TARGET UPDATES
+        function updateDailyGoal(val) {
+            let goal = parseInt(val);
+            if (goal && goal >= 500 && goal <= 10000) {
+                state.dailyCalorieGoal = goal;
+                saveStateToLocalStorage();
+                renderAll();
+            }
+        }
+
+        // Daily Water Target updates
+        function updateDailyWaterGoal(val) {
+            let goal = parseFloat(val);
+            if (goal && goal >= 10 && goal <= 500) {
+                state.dailyWaterGoal = goal;
+                saveStateToLocalStorage();
+                renderAll();
+            }
+        }
+
+        function updateDietType(val) {
+            if (DIET_SPLITS[val]) {
+                state.dietType = val;
+                saveStateToLocalStorage();
+                renderAll();
+            }
+        }
+
+        // WATER ACTIONS
         function addWater(amount) {
-            ensureDayExists(selectedDateKey);
-            let current = appState.history[selectedDateKey].water || 0;
-            current = Math.max(0, current + amount);
-            appState.history[selectedDateKey].water = current;
-            saveData();
-            renderApp();
+            const activeDays = getActiveDays();
+            const activeDate = activeDays[state.selectedDayIndex].date;
+            const log = getLogForDate(activeDate);
+            
+            log.water = Math.max(0, parseFloat((log.water + amount).toFixed(1)));
+            saveStateToLocalStorage();
+            renderAll();
         }
 
         function addCustomWater() {
             const input = document.getElementById('customWaterInput');
             const amount = parseFloat(input.value);
-            if (!isNaN(amount) && amount > 0) {
+            if (amount && amount > 0) {
                 addWater(amount);
                 input.value = '';
             }
         }
 
-        // Help guarantee historical dates exist safe in state
-        function ensureDayExists(dateKey) {
-            if (!appState.history[dateKey]) {
-                appState.history[dateKey] = {
-                    goal: appState.settings.dailyGoal,
-                    water: 0,
-                    meals: []
-                };
-            }
-        }
-
-        // Update Daily Goals
-        function updateDailyGoal(val) {
-            const goal = parseInt(val);
-            if (!isNaN(goal) && goal >= 500) {
-                appState.settings.dailyGoal = goal;
-                // Also update selected day goal for real-time calculation
-                ensureDayExists(selectedDateKey);
-                appState.history[selectedDateKey].goal = goal;
-                saveData();
-                renderApp();
-            }
-        }
-
-        function updateDailyWaterGoal(val) {
-            const goal = parseInt(val);
-            if (!isNaN(goal) && goal >= 10) {
-                appState.settings.dailyWaterGoal = goal;
-                saveData();
-                renderApp();
-            }
-        }
-
-        // Handle meal log form submissions
+        // MEAL ACTIONS
         function handleMealSubmit(e) {
             e.preventDefault();
+            const activeDays = getActiveDays();
+            const activeDate = activeDays[state.selectedDayIndex].date;
+            const log = getLogForDate(activeDate);
 
-            const name = document.getElementById('mealName').value.trim();
-            const calories = parseInt(document.getElementById('mealCalories').value) || 0;
-            const protein = parseInt(document.getElementById('mealProtein').value) || 0;
-            const carbs = parseInt(document.getElementById('mealCarbs').value) || 0;
-            const fats = parseInt(document.getElementById('mealFats').value) || 0;
+            const mName = document.getElementById('mealName').value;
+            const mCals = parseInt(document.getElementById('mealCalories').value) || 0;
+            const mProt = parseInt(document.getElementById('mealProtein').value) || 0;
+            const mCarb = parseInt(document.getElementById('mealCarbs').value) || 0;
+            const mFats = parseInt(document.getElementById('mealFats').value) || 0;
 
-            ensureDayExists(selectedDateKey);
-
-            if (editingMealIndex !== null && editingDateKey !== null) {
-                // We are editing an existing meal entry
-                if (appState.history[editingDateKey] && appState.history[editingDateKey].meals[editingMealIndex]) {
-                    appState.history[editingDateKey].meals[editingMealIndex] = {
-                        name, calories, protein, carbs, fats
+            if (editingMealId) {
+                // Update existing
+                const mealIndex = log.meals.findIndex(m => m.id === editingMealId);
+                if (mealIndex !== -1) {
+                    log.meals[mealIndex] = {
+                        id: editingMealId,
+                        name: mName,
+                        calories: mCals,
+                        protein: mProt,
+                        carbs: mCarb,
+                        fats: mFats
                     };
                 }
-                editingMealIndex = null;
-                editingDateKey = null;
+                editingMealId = null;
+                document.getElementById('formSubmitBtn').innerText = "Add Meal Log";
+                document.getElementById('cancelEditBtn').classList.add('hidden');
+                document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-indigo-500 rounded-full";
             } else {
-                // Creating a brand new log
-                appState.history[selectedDateKey].meals.push({
-                    name, calories, protein, carbs, fats
-                });
+                // Create new
+                const newMeal = {
+                    id: "meal-" + Date.now(),
+                    name: mName,
+                    calories: mCals,
+                    protein: mProt,
+                    carbs: mCarb,
+                    fats: mFats
+                };
+                log.meals.push(newMeal);
             }
 
-            // Reset form fields
             document.getElementById('mealForm').reset();
-            cancelEdit();
-            saveData();
-            renderApp();
+            saveStateToLocalStorage();
+            renderAll();
         }
 
-        // Modify meal logic
-        function startEditMeal(index) {
-            ensureDayExists(selectedDateKey);
-            const meal = appState.history[selectedDateKey].meals[index];
-            if (!meal) return;
+        function editMeal(id) {
+            const activeDays = getActiveDays();
+            const activeDate = activeDays[state.selectedDayIndex].date;
+            const log = getLogForDate(activeDate);
+            const meal = log.meals.find(m => m.id === id);
 
-            editingMealIndex = index;
-            editingDateKey = selectedDateKey;
+            if (meal) {
+                editingMealId = id;
+                document.getElementById('mealName').value = meal.name;
+                document.getElementById('mealCalories').value = meal.calories;
+                document.getElementById('mealProtein').value = meal.protein;
+                document.getElementById('mealCarbs').value = meal.carbs;
+                document.getElementById('mealFats').value = meal.fats;
 
-            // Load values to form
-            document.getElementById('mealName').value = meal.name;
-            document.getElementById('mealCalories').value = meal.calories;
-            document.getElementById('mealProtein').value = meal.protein || '';
-            document.getElementById('mealCarbs').value = meal.carbs || '';
-            document.getElementById('mealFats').value = meal.fats || '';
-
-            // Update UI components
-            document.getElementById('formTitleText').innerText = "Edit Meal for";
-            document.getElementById('formSubmitBtn').innerText = "Update Meal";
-            document.getElementById('cancelEditBtn').classList.remove('hidden');
-            document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-amber-500 rounded-full animate-ping";
+                document.getElementById('formSubmitBtn').innerText = "Save Changes";
+                document.getElementById('cancelEditBtn').classList.remove('hidden');
+                document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse";
+                document.getElementById('mealName').focus();
+            }
         }
 
         function cancelEdit() {
-            editingMealIndex = null;
-            editingDateKey = null;
-
+            editingMealId = null;
             document.getElementById('mealForm').reset();
-            document.getElementById('formTitleText').innerText = "Log Meal for";
             document.getElementById('formSubmitBtn').innerText = "Add Meal Log";
             document.getElementById('cancelEditBtn').classList.add('hidden');
             document.getElementById('formStatusIndicator').className = "w-2.5 h-2.5 bg-indigo-500 rounded-full";
         }
 
-        function deleteMeal(index) {
-            ensureDayExists(selectedDateKey);
-            appState.history[selectedDateKey].meals.splice(index, 1);
-            cancelEdit();
-            saveData();
-            renderApp();
+        function deleteMeal(id) {
+            const activeDays = getActiveDays();
+            const activeDate = activeDays[state.selectedDayIndex].date;
+            const log = getLogForDate(activeDate);
+            log.meals = log.meals.filter(m => m.id !== id);
+            
+            if (editingMealId === id) {
+                cancelEdit();
+            }
+
+            saveStateToLocalStorage();
+            renderAll();
         }
 
-        // BMR Collapsible Toggles
-        function toggleBmrCalculator() {
-            const section = document.getElementById('bmrSection');
-            const toggleText = document.getElementById('bmrToggleText');
-            const icon = document.getElementById('bmrToggleIcon');
-
+        // QUICK MEALS LIBRARY ACTIONS
+        function toggleQuickMealForm() {
+            const section = document.getElementById('quickMealFormSection');
+            const toggleText = document.getElementById('quickMealFormToggleText');
             if (section.classList.contains('hidden')) {
                 section.classList.remove('hidden');
-                icon.style.transform = "rotate(180deg)";
+                toggleText.innerText = "Cancel";
             } else {
                 section.classList.add('hidden');
-                icon.style.transform = "rotate(0deg)";
+                toggleText.innerText = "+ Add Quick Meal";
+                clearQuickMealForm();
             }
         }
 
-        // BMR Calculation & Rendering recommendations
+        function clearQuickMealForm() {
+            editingQuickMealId = null;
+            document.getElementById('quickMealName').value = '';
+            document.getElementById('quickMealCalories').value = '';
+            document.getElementById('quickMealProtein').value = '';
+            document.getElementById('quickMealCarbs').value = '';
+            document.getElementById('quickMealFats').value = '';
+            document.getElementById('quickMealSaveBtn').innerText = "Save to Library";
+            document.getElementById('quickMealFormTitle').innerText = "Create Quick Meal";
+        }
+
+        function saveQuickMeal() {
+            const qName = document.getElementById('quickMealName').value;
+            const qCals = parseInt(document.getElementById('quickMealCalories').value) || 0;
+            const qProt = parseInt(document.getElementById('quickMealProtein').value) || 0;
+            const qCarb = parseInt(document.getElementById('quickMealCarbs').value) || 0;
+            const qFats = parseInt(document.getElementById('quickMealFats').value) || 0;
+
+            if (!qName) return;
+
+            if (editingQuickMealId) {
+                const qmIndex = state.quickMeals.findIndex(q => q.id === editingQuickMealId);
+                if (qmIndex !== -1) {
+                    state.quickMeals[qmIndex] = {
+                        id: editingQuickMealId,
+                        name: qName,
+                        calories: qCals,
+                        protein: qProt,
+                        carbs: qCarb,
+                        fats: qFats
+                    };
+                }
+            } else {
+                const newQuickMeal = {
+                    id: "qm-" + Date.now(),
+                    name: qName,
+                    calories: qCals,
+                    protein: qProt,
+                    carbs: qCarb,
+                    fats: qFats
+                };
+                state.quickMeals.push(newQuickMeal);
+            }
+
+            clearQuickMealForm();
+            toggleQuickMealForm();
+            saveStateToLocalStorage();
+            renderAll();
+        }
+
+        function editQuickMeal(id) {
+            const qm = state.quickMeals.find(q => q.id === id);
+            if (qm) {
+                editingQuickMealId = id;
+                document.getElementById('quickMealFormSection').classList.remove('hidden');
+                document.getElementById('quickMealFormToggleText').innerText = "Cancel";
+                document.getElementById('quickMealFormTitle').innerText = "Edit Quick Meal";
+                
+                document.getElementById('quickMealName').value = qm.name;
+                document.getElementById('quickMealCalories').value = qm.calories;
+                document.getElementById('quickMealProtein').value = qm.protein;
+                document.getElementById('quickMealCarbs').value = qm.carbs;
+                document.getElementById('quickMealFats').value = qm.fats;
+                
+                document.getElementById('quickMealSaveBtn').innerText = "Apply Edits";
+                document.getElementById('quickMealName').focus();
+            }
+        }
+
+        function deleteQuickMeal(id) {
+            state.quickMeals = state.quickMeals.filter(q => q.id !== id);
+            saveStateToLocalStorage();
+            renderAll();
+        }
+
+        function quickLogMeal(id) {
+            const qm = state.quickMeals.find(q => q.id === id);
+            if (qm) {
+                const activeDays = getActiveDays();
+                const activeDate = activeDays[state.selectedDayIndex].date;
+                const log = getLogForDate(activeDate);
+
+                const newLog = {
+                    id: "meal-" + Date.now(),
+                    name: qm.name,
+                    calories: qm.calories,
+                    protein: qm.protein,
+                    carbs: qm.carbs,
+                    fats: qm.fats
+                };
+                log.meals.push(newLog);
+                saveStateToLocalStorage();
+                renderAll();
+            }
+        }
+
+        // BMR CALCULATOR
+        function toggleBmrCalculator() {
+            const section = document.getElementById('bmrSection');
+            const icon = document.getElementById('bmrToggleIcon');
+            const text = document.getElementById('bmrToggleText');
+
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                text.innerText = "Hide Calculator";
+            } else {
+                section.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+                text.innerText = "BMR Calculator";
+            }
+        }
+
         function calculateBMR() {
             const gender = document.getElementById('bmrGender').value;
             const age = parseInt(document.getElementById('bmrAge').value);
             const weightLbs = parseFloat(document.getElementById('bmrWeight').value);
             const heightInches = parseFloat(document.getElementById('bmrHeight').value);
 
-            if (!age || !weightLbs || !heightInches) {
-                alert("Please fill in age, weight, and height to calculate BMR.");
-                return;
-            }
+            if (!age || !weightLbs || !heightInches) return;
 
-            // Convert standard US units to metric values
+            // Mifflin-St Jeor conversion parameters
             const weightKg = weightLbs * 0.45359237;
             const heightCm = heightInches * 2.54;
 
-            // Mifflin-St Jeor Formula
             let bmr = 0;
             if (gender === 'male') {
-                bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5;
+                bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
             } else {
-                bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+                bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
             }
 
             bmr = Math.round(bmr);
-            document.getElementById('bmrVal').innerText = `${bmr.toLocaleString()} kcal`;
+            document.getElementById('bmrVal').innerText = bmr + " kcal";
 
-            // Setup TDEE Multipliers
-            const activities = [
-                { name: "Sedentary", desc: "Desk job, little to no exercise", mult: 1.2 },
-                { name: "Lightly Active", desc: "Light exercise 1-3 days/week", mult: 1.375 },
-                { name: "Moderately Active", desc: "Moderate workouts 3-5 days/week", mult: 1.55 },
-                { name: "Very Active", desc: "Hard training/sports 6-7 days/week", mult: 1.725 },
-                { name: "Athletic Premium", desc: "Very heavy workouts & physically demanding job", mult: 1.9 }
+            const activityMultipliers = [
+                { name: "Sedentary (No exercise)", factor: 1.2 },
+                { name: "Lightly Active (1-3 days/wk)", factor: 1.375 },
+                { name: "Moderately Active (3-5 days/wk)", factor: 1.55 },
+                { name: "Very Active (6-7 days/wk athletic training)", factor: 1.725 },
+                { name: "Extremely Active (Hyperactive athlete)", factor: 1.9 }
             ];
 
-            const recsContainer = document.getElementById('activityRecommendations');
-            recsContainer.innerHTML = '';
-
-            activities.forEach((act, idx) => {
-                const tdee = Math.round(bmr * act.mult);
-                const row = document.createElement('div');
-                row.className = "flex justify-between items-center bg-slate-950 p-2 rounded-lg border border-slate-850 hover:border-slate-800 transition gap-2";
-                row.innerHTML = `
-                    <div class="min-w-0 flex-1">
-                        <div class="text-[10px] font-bold text-slate-200">${act.name}</div>
-                        <div class="text-[8px] text-slate-500 truncate" title="${act.desc}">${act.desc}</div>
-                    </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                        <span class="text-xs font-black text-indigo-400">${tdee.toLocaleString()} kcal</span>
-                        <button onclick="applyTdeeTarget(${tdee})" class="bg-indigo-900/50 hover:bg-indigo-600 text-[9px] hover:text-white text-indigo-300 font-bold px-2 py-1 rounded transition">
+            let recommendationsHtml = '';
+            activityMultipliers.forEach((act, idx) => {
+                let tdee = Math.round(bmr * act.factor);
+                recommendationsHtml += `
+                    <div class="flex justify-between items-center text-[11px] p-2 bg-slate-950/50 rounded-lg hover:border-indigo-500/30 border border-transparent transition">
+                        <div>
+                            <span class="block font-medium text-slate-300">${act.name}</span>
+                            <span class="text-slate-500 text-[9px]">TDEE Target: ${tdee} kcal</span>
+                        </div>
+                        <button type="button" onclick="applyCalorieTarget(${tdee})" class="px-2 py-1 bg-indigo-950/60 hover:bg-indigo-600 border border-indigo-800 hover:border-indigo-400 hover:text-white text-indigo-300 rounded text-[10px] font-bold transition">
                             Apply
                         </button>
                     </div>
                 `;
-                recsContainer.appendChild(row);
             });
 
+            document.getElementById('activityRecommendations').innerHTML = recommendationsHtml;
             document.getElementById('bmrResults').classList.remove('hidden');
         }
 
-        // Apply BMR calculated goal directly
-        function applyTdeeTarget(tdee) {
-            document.getElementById('dailyGoalInput').value = tdee;
-            updateDailyGoal(tdee);
+        function applyCalorieTarget(target) {
+            state.dailyCalorieGoal = target;
+            document.getElementById('dailyGoalInput').value = target;
+            saveStateToLocalStorage();
+            renderAll();
         }
 
-        // Quick Meal creation & templates
-        function toggleQuickMealForm() {
-            const form = document.getElementById('quickMealFormSection');
-            const btnText = document.getElementById('quickMealFormToggleText');
-
-            if (form.classList.contains('hidden')) {
-                form.classList.remove('hidden');
-                btnText.innerText = "Close Form";
-            } else {
-                form.classList.add('hidden');
-                btnText.innerText = "+ Add Quick Meal";
-                clearQuickMealForm();
-            }
+        // RESET CURRENT WEEK RECORDS
+        function resetCurrentWeek() {
+            const activeDays = getActiveDays();
+            activeDays.forEach(day => {
+                state.logs[day.date] = { meals: [], water: 0 };
+            });
+            saveStateToLocalStorage();
+            renderAll();
         }
 
-        // Clear Quick Meal form
-        function clearQuickMealForm() {
-            editingQuickMealId = null;
-            document.getElementById('quickMealFormTitle').innerText = "Create Quick Meal";
-            document.getElementById('quickMealSaveBtn').innerText = "Save to Library";
+        // DEMO ATHLETIC DATA GENERATOR
+        function loadDemoData() {
+            const activeDays = getActiveDays();
+            
+            const demoMealsPool = [
+                { name: "Egg White Scramble & Toast", calories: 340, protein: 35, carbs: 24, fats: 8 },
+                { name: "Whey Protein Shake & Banana", calories: 290, protein: 30, carbs: 36, fats: 2 },
+                { name: "Lean Chicken Breast & Quinoa", calories: 550, protein: 48, carbs: 55, fats: 10 },
+                { name: "Almonds & Beef Jerky Snack", calories: 210, protein: 18, carbs: 6, fats: 12 },
+                { name: "Broiled Salmon & Sweet Potato", calories: 620, protein: 44, carbs: 48, fats: 22 },
+                { name: "Greek Yogurt Bowl with Berries", calories: 240, protein: 22, carbs: 18, fats: 6 },
+                { name: "Elite Protein Shake with Peanut Butter", calories: 420, protein: 36, carbs: 28, fats: 16 }
+            ];
 
-            document.getElementById('quickMealName').value = '';
-            document.getElementById('quickMealCalories').value = '';
-            document.getElementById('quickMealProtein').value = '';
-            document.getElementById('quickMealCarbs').value = '';
-            document.getElementById('quickMealFats').value = '';
-        }
-
-        // Save Quick Meal
-        function saveQuickMeal() {
-            const name = document.getElementById('quickMealName').value.trim();
-            const calories = parseInt(document.getElementById('quickMealCalories').value) || 0;
-            const protein = parseInt(document.getElementById('quickMealProtein').value) || 0;
-            const carbs = parseInt(document.getElementById('quickMealCarbs').value) || 0;
-            const fats = parseInt(document.getElementById('quickMealFats').value) || 0;
-
-            if (!name) {
-                alert("Please provide a name for your Quick Meal.");
-                return;
-            }
-
-            if (editingQuickMealId !== null) {
-                // Updating template
-                const idx = appState.quickMeals.findIndex(m => m.id === editingQuickMealId);
-                if (idx !== -1) {
-                    appState.quickMeals[idx] = {
-                        id: editingQuickMealId,
-                        name, calories, protein, carbs, fats
-                    };
+            activeDays.forEach((day, idx) => {
+                // Populate distinct mock nutrition for each day
+                let dayMeals = [];
+                // add 2 to 3 distinct meals per day
+                let mealsCount = 2 + (idx % 2);
+                for (let m = 0; m < mealsCount; m++) {
+                    let randomMeal = demoMealsPool[(idx + m) % demoMealsPool.length];
+                    dayMeals.push({
+                        id: "meal-demo-" + idx + "-" + m,
+                        name: randomMeal.name,
+                        calories: randomMeal.calories,
+                        protein: randomMeal.protein,
+                        carbs: randomMeal.carbs,
+                        fats: randomMeal.fats
+                    });
                 }
-            } else {
-                // Creating a brand new template
-                const newId = Date.now();
-                appState.quickMeals.push({
-                    id: newId,
-                    name, calories, protein, carbs, fats
-                });
-            }
 
-            clearQuickMealForm();
-            document.getElementById('quickMealFormSection').classList.add('hidden');
-            document.getElementById('quickMealFormToggleText').innerText = "+ Add Quick Meal";
+                // Random water intake between 60 oz and 120 oz
+                let waterAmount = Math.round(70 + (idx * 9.5) % 55);
 
-            saveData();
-            renderApp();
-        }
-
-        // Start edit Quick Meal
-        function startEditQuickMeal(id) {
-            const meal = appState.quickMeals.find(m => m.id === id);
-            if (!meal) return;
-
-            editingQuickMealId = id;
-
-            // Fill Quick Meal inputs
-            document.getElementById('quickMealName').value = meal.name;
-            document.getElementById('quickMealCalories').value = meal.calories;
-            document.getElementById('quickMealProtein').value = meal.protein || '';
-            document.getElementById('quickMealCarbs').value = meal.carbs || '';
-            document.getElementById('quickMealFats').value = meal.fats || '';
-
-            // Update UI fields
-            document.getElementById('quickMealFormTitle').innerText = "Edit Quick Meal Templates";
-            document.getElementById('quickMealSaveBtn').innerText = "Update Template";
-            document.getElementById('quickMealFormSection').classList.remove('hidden');
-            document.getElementById('quickMealFormToggleText').innerText = "Close Form";
-        }
-
-        // Delete Quick Meal template
-        function deleteQuickMeal(id) {
-            if (confirm("Are you sure you want to delete this Quick Meal template?")) {
-                appState.quickMeals = appState.quickMeals.filter(m => m.id !== id);
-                if (editingQuickMealId === id) {
-                    clearQuickMealForm();
-                }
-                saveData();
-                renderApp();
-            }
-        }
-
-        // Add Quick Meal template into active log directly
-        function addQuickMealToLog(id) {
-            const meal = appState.quickMeals.find(m => m.id === id);
-            if (!meal) return;
-
-            ensureDayExists(selectedDateKey);
-            appState.history[selectedDateKey].meals.push({
-                name: meal.name,
-                calories: meal.calories,
-                protein: meal.protein || 0,
-                carbs: meal.carbs || 0,
-                fats: meal.fats || 0
+                state.logs[day.date] = {
+                    meals: dayMeals,
+                    water: waterAmount
+                };
             });
 
-            saveData();
-            renderApp();
+            saveStateToLocalStorage();
+            renderAll();
         }
 
-        // Toggle Icons / Guide collapsibles
-        function toggleIconGuide() {
-            const section = document.getElementById('iconGuideSection');
-            const icon = document.getElementById('iconGuideToggleIcon');
+        // RENDERING FUNCTIONS
+        function renderAll() {
+            const activeDays = getActiveDays();
+            const activeDate = activeDays[state.selectedDayIndex].date;
+            const activeDayLog = getLogForDate(activeDate);
 
-            if (section.classList.contains('hidden')) {
-                section.classList.remove('hidden');
-                icon.style.transform = "rotate(180deg)";
-            } else {
-                section.classList.add('hidden');
-                icon.style.transform = "rotate(0deg)";
+            // 1. UPDATE DYNAMIC WEEK RANGE TEXTS
+            document.getElementById('weekDisplayRange').innerText = getWeekRangeLabel(activeDays);
+            document.getElementById('logDayLabel').innerText = activeDays[state.selectedDayIndex].dayName;
+
+            // 2. RENDER SELECTED DAY'S WATER PROGRESS
+            document.getElementById('hydrationTotal').innerText = `${activeDayLog.water} / ${state.dailyWaterGoal} oz`;
+            let waterPercent = Math.min(100, Math.round((activeDayLog.water / state.dailyWaterGoal) * 100)) || 0;
+            document.getElementById('hydrationProgressBar').style.width = waterPercent + "%";
+            document.getElementById('hydrationPercent').innerText = waterPercent + "%";
+            document.getElementById('hydrationPercentLabel').innerText = waterPercent + "% Logged";
+
+            // 3. RENDER SELECTED DAY'S LOGGED MEALS & CALORIC / MACRO BREAKDOWNS
+            let selectedTotalCalories = 0;
+            let selectedTotalProtein = 0;
+            let selectedTotalCarbs = 0;
+            let selectedTotalFats = 0;
+
+            let mealListHtml = '';
+            activeDayLog.meals.forEach(meal => {
+                selectedTotalCalories += meal.calories;
+                selectedTotalProtein += meal.protein;
+                selectedTotalCarbs += meal.carbs;
+                selectedTotalFats += meal.fats;
+
+                mealListHtml += `
+                    <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-850 hover:border-slate-750 transition group">
+                        <div class="space-y-1">
+                            <span class="block text-xs font-semibold text-slate-200 group-hover:text-indigo-400 transition">${meal.name}</span>
+                            <div class="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                <span class="text-slate-400 font-black">${meal.calories} kcal</span>
+                                <span>•</span>
+                                <span class="text-emerald-500">${meal.protein}g P</span>
+                                <span>•</span>
+                                <span class="text-indigo-400">${meal.carbs}g C</span>
+                                <span>•</span>
+                                <span class="text-amber-500">${meal.fats}g F</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editMeal('${meal.id}')" class="p-1 hover:bg-slate-900 rounded border border-transparent hover:border-slate-800 text-slate-400 hover:text-indigo-400 transition" title="Edit Meal Entry">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button onclick="deleteMeal('${meal.id}')" class="p-1 hover:bg-slate-900 rounded border border-transparent hover:border-slate-800 text-slate-500 hover:text-rose-400 transition" title="Delete Meal Entry">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (activeDayLog.meals.length === 0) {
+                mealListHtml = `
+                    <div class="flex flex-col items-center justify-center p-8 text-center bg-slate-950/40 rounded-xl border border-slate-850/50">
+                        <svg class="w-8 h-8 text-slate-600 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">No meals logged for this day</span>
+                        <p class="text-[10px] text-slate-600 mt-1">Use the quick meals library or complete the form above to log calories.</p>
+                    </div>
+                `;
             }
-        }
 
-        // Seed fully operational Demo Data
-        function loadDemoData() {
-            if (confirm("Loading demo data will populate calories & water logs for the visible week. Continue?")) {
-                const demoState = generateMockData();
-                appState.history = Object.assign({}, appState.history, demoState.history);
-                saveData();
-                renderApp();
-            }
-        }
+            document.getElementById('mealList').innerHTML = mealListHtml;
+            document.getElementById('selectedDayTotal').innerText = selectedTotalCalories + " kcal";
 
-        // Reset All Active Data safely (Preserves custom quick meals & targets)
-        function resetAllData() {
-            if (confirm("Are you sure you want to clear food and water logs for the visible week? This will NOT delete your targets or quick meals.")) {
-                const days = getWeeklyDays();
-                days.forEach(day => {
-                    const dKey = formatDateKey(day);
-                    if (appState.history[dKey]) {
-                        // Reset logs but retain custom goal targets
-                        appState.history[dKey].meals = [];
-                        appState.history[dKey].water = 0;
-                    }
+            // Render selected day macros relative to targets
+            const targetMacros = getMacroGramsTarget();
+            document.getElementById('selectedProteinTotal').innerText = selectedTotalProtein + "g";
+            document.getElementById('selectedCarbsTotal').innerText = selectedTotalCarbs + "g";
+            document.getElementById('selectedFatsTotal').innerText = selectedTotalFats + "g";
+
+            document.getElementById('proteinTargetLabel').innerText = targetMacros.p + "g";
+            document.getElementById('carbsTargetLabel').innerText = targetMacros.c + "g";
+            document.getElementById('fatsTargetLabel').innerText = targetMacros.f + "g";
+
+            // Real ratios percentages calculations
+            let pPctReal = targetMacros.p > 0 ? Math.round((selectedTotalProtein / targetMacros.p) * 100) : 0;
+            let cPctReal = targetMacros.c > 0 ? Math.round((selectedTotalCarbs / targetMacros.c) * 100) : 0;
+            let fPctReal = targetMacros.f > 0 ? Math.round((selectedTotalFats / targetMacros.f) * 100) : 0;
+
+            let pPct = Math.min(100, pPctReal);
+            let cPct = Math.min(100, cPctReal);
+            let fPct = Math.min(100, fPctReal);
+
+            document.getElementById('proteinBar').style.width = pPct + "%";
+            document.getElementById('carbsBar').style.width = cPct + "%";
+            document.getElementById('fatsBar').style.width = fPct + "%";
+
+            // Update percentage labels
+            document.getElementById('proteinPercentText').innerText = pPctReal + "% of target";
+            document.getElementById('carbsPercentText').innerText = cPctReal + "% of target";
+            document.getElementById('fatsPercentText').innerText = fPctReal + "% of target";
+
+            // Remaining target calculations
+            let pRemaining = targetMacros.p - selectedTotalProtein;
+            let cRemaining = targetMacros.c - selectedTotalCarbs;
+            let fRemaining = targetMacros.f - selectedTotalFats;
+
+            document.getElementById('proteinRemainingText').innerText = pRemaining > 0 ? pRemaining + "g remaining" : "Target Met (" + Math.abs(pRemaining) + "g surplus)";
+            document.getElementById('carbsRemainingText').innerText = cRemaining > 0 ? cRemaining + "g remaining" : "Target Met (" + Math.abs(cRemaining) + "g surplus)";
+            document.getElementById('fatsRemainingText').innerText = fRemaining > 0 ? fRemaining + "g remaining" : "Target Met (" + Math.abs(fRemaining) + "g surplus)";
+
+            // 4. RENDER QUICK MEALS LIBRARY
+            let quickMealsHtml = '';
+            state.quickMeals.forEach(qm => {
+                quickMealsHtml += `
+                    <div class="flex justify-between items-center bg-slate-950/70 p-2.5 rounded-xl border border-slate-850 hover:border-slate-800 transition">
+                        <div class="space-y-0.5">
+                            <span class="text-xs font-bold text-slate-200 block">${qm.name}</span>
+                            <div class="flex items-center gap-1.5 text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                                <span class="text-indigo-400 font-black">${qm.calories} kcal</span>
+                                <span>•</span>
+                                <span class="text-emerald-500">${qm.protein}P</span>
+                                <span>•</span>
+                                <span class="text-indigo-400">${qm.carbs}C</span>
+                                <span>•</span>
+                                <span class="text-amber-500">${qm.fats}F</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="quickLogMeal('${qm.id}')" class="px-2 py-1 bg-indigo-950 hover:bg-indigo-600 hover:text-white border border-indigo-900 text-indigo-400 text-[10px] font-extrabold rounded-lg transition active:scale-95" title="Quick log this meal into currently selected day">
+                                Log
+                            </button>
+                            <button onclick="editQuickMeal('${qm.id}')" class="p-1 hover:bg-slate-900 border border-transparent hover:border-slate-850 text-slate-500 hover:text-indigo-400 rounded transition" title="Edit template definition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button onclick="deleteQuickMeal('${qm.id}')" class="p-1 hover:bg-slate-900 border border-transparent hover:border-slate-850 text-slate-600 hover:text-rose-400 rounded transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('quickMealsList').innerHTML = quickMealsHtml;
+
+            // 5. RENDER WEEKLY OVERVIEW HERO METRICS
+            let weeklyTotalCalories = 0;
+            let weeklyTotalWater = 0;
+            let weeklyTotalProtein = 0;
+            let weeklyTotalCarbs = 0;
+            let weeklyTotalFats = 0;
+
+            activeDays.forEach(day => {
+                const dayLog = getLogForDate(day.date);
+                weeklyTotalWater += dayLog.water;
+                dayLog.meals.forEach(m => {
+                    weeklyTotalCalories += m.calories;
+                    weeklyTotalProtein += m.protein;
+                    weeklyTotalCarbs += m.carbs;
+                    weeklyTotalFats += m.fats;
                 });
-                cancelEdit();
-                saveData();
-                renderApp();
+            });
+
+            const weeklyMaxTarget = state.dailyCalorieGoal * 7;
+            const avgWater = Math.round(weeklyTotalWater / 7);
+
+            document.getElementById('weeklyTotalCalories').innerText = weeklyTotalCalories + " kcal";
+            document.getElementById('weeklyMaxCalories').innerText = weeklyMaxTarget + " kcal";
+            document.getElementById('weeklyTotalWater').innerText = weeklyTotalWater + " oz";
+            document.getElementById('weeklyAvgWater').innerText = avgWater + " oz / d";
+
+            const weeklyCalPercent = Math.min(100, Math.round((weeklyTotalCalories / weeklyMaxTarget) * 100)) || 0;
+            document.getElementById('weeklyProgressBar').style.width = weeklyCalPercent + "%";
+            document.getElementById('weeklyProgressPercent').innerText = weeklyCalPercent + "%";
+
+            // Update tri-color weekly split macro ratios achieved
+            let totalMacrosCal = (weeklyTotalProtein * 4) + (weeklyTotalCarbs * 4) + (weeklyTotalFats * 9);
+            if (totalMacrosCal > 0) {
+                let wp = Math.round(((weeklyTotalProtein * 4) / totalMacrosCal) * 100);
+                let wc = Math.round(((weeklyTotalCarbs * 4) / totalMacrosCal) * 100);
+                let wf = 100 - wp - wc;
+
+                document.getElementById('weekProteinBar').style.width = wp + "%";
+                document.getElementById('weekCarbsBar').style.width = wc + "%";
+                document.getElementById('weekFatsBar').style.width = wf + "%";
+
+                document.getElementById('weekProteinPct').innerText = wp + "%";
+                document.getElementById('weekCarbsPct').innerText = wc + "%";
+                document.getElementById('weekFatsPct').innerText = wf + "%";
+            } else {
+                document.getElementById('weekProteinBar').style.width = "33%";
+                document.getElementById('weekCarbsBar').style.width = "33%";
+                document.getElementById('weekFatsBar').style.width = "34%";
+
+                document.getElementById('weekProteinPct').innerText = "0%";
+                document.getElementById('weekCarbsPct').innerText = "0%";
+                document.getElementById('weekFatsPct').innerText = "0%";
             }
+
+            // 6. RENDER 7-DAY VISUAL GRID
+            let gridHtml = '';
+            activeDays.forEach((day, idx) => {
+                const dayLog = getLogForDate(day.date);
+                let dayCalories = 0;
+                let dayProtein = 0;
+                let dayCarbs = 0;
+                let dayFats = 0;
+
+                dayLog.meals.forEach(m => {
+                    dayCalories += m.calories;
+                    dayProtein += m.protein;
+                    dayCarbs += m.carbs;
+                    dayFats += m.fats;
+                });
+
+                const isSelected = (idx === state.selectedDayIndex);
+                const borderClass = isSelected 
+                    ? 'border-indigo-500 ring-2 ring-indigo-500/20 bg-slate-900' 
+                    : 'border-slate-800 bg-slate-900/60 hover:border-slate-700';
+
+                // Miniature macros completion
+                let pMiniPct = Math.min(100, (dayProtein / targetMacros.p) * 100) || 0;
+                let cMiniPct = Math.min(100, (dayCarbs / targetMacros.c) * 100) || 0;
+                let fMiniPct = Math.min(100, (dayFats / targetMacros.f) * 100) || 0;
+
+                // Miniature water progress
+                let wMiniPct = Math.min(100, (dayLog.water / state.dailyWaterGoal) * 100) || 0;
+
+                gridHtml += `
+                    <div onclick="selectDay(${idx})" class="p-3.5 border rounded-2xl cursor-pointer transition flex flex-col justify-between ${borderClass} group">
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-200 group-hover:text-indigo-400 transition">${day.dayName.substring(0, 3)}</span>
+                                <span class="text-[9px] font-bold text-slate-500 tracking-wide">${day.displayDate}</span>
+                            </div>
+                            <div class="text-[11px] font-black tracking-tight text-slate-200 mt-0.5">
+                                ${dayCalories} <span class="text-[8px] text-slate-500 uppercase font-medium">kcal</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 mt-4">
+                            <!-- Miniature Macro bars -->
+                            <div class="space-y-0.5">
+                                <div class="w-full bg-slate-950 h-[3px] rounded-full overflow-hidden">
+                                    <div class="bg-emerald-500 h-full" style="width: ${pMiniPct}%"></div>
+                                </div>
+                                <div class="w-full bg-slate-950 h-[3px] rounded-full overflow-hidden">
+                                    <div class="bg-indigo-500 h-full" style="width: ${cMiniPct}%"></div>
+                                </div>
+                                <div class="w-full bg-slate-950 h-[3px] rounded-full overflow-hidden">
+                                    <div class="bg-amber-500 h-full" style="width: ${fMiniPct}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Dedicated water indicator -->
+                            <div class="space-y-0.5 border-t border-slate-800/80 pt-1.5">
+                                <div class="flex justify-between items-center text-[7px] text-slate-500 font-bold uppercase tracking-wider">
+                                    <span class="text-sky-400">H2O</span>
+                                    <span>${dayLog.water}oz</span>
+                                </div>
+                                <div class="w-full bg-slate-950 h-[3px] rounded-full overflow-hidden">
+                                    <div class="bg-sky-400 h-full" style="width: ${wMiniPct}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('weeklyGrid').innerHTML = gridHtml;
+
+            // 7. Dynamic status badge on summary card
+            const activeStatusBadge = document.getElementById('weekStatusBadge');
+            const todayStr = formatDateString(new Date());
+            const hasToday = activeDays.some(d => d.date === todayStr);
+            if (hasToday) {
+                activeStatusBadge.innerText = "Current week";
+                activeStatusBadge.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950/40 text-emerald-300 border border-emerald-900";
+            } else {
+                activeStatusBadge.innerText = "Historical view";
+                activeStatusBadge.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-850 text-slate-400 border border-slate-800";
+            }
+        }
+
+        function getWeekRangeLabel(activeDays) {
+            let start = new Date(activeDays[0].date + "T00:00:00");
+            let end = new Date(activeDays[6].date + "T00:00:00");
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return `${months[start.getMonth()]} ${start.getDate()} - ${months[end.getMonth()]} ${end.getDate()}, ${end.getFullYear()}`;
+        }
+
+        function selectDay(index) {
+            state.selectedDayIndex = index;
+            // Clean edit triggers if selecting another day
+            if (editingMealId) {
+                cancelEdit();
+            }
+            renderAll();
         }
     </script>
 </body>
